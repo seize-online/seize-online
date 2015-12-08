@@ -1,0 +1,9 @@
+[submodule "public/lib/sketch.js"]
+	path = public/lib/sketch.js
+	url = https://github.com/soulwire/sketch.js.git
+[submodule "public/lib/Chart.js"]
+	path = public/lib/Chart.js
+	url = https://github.com/nnnick/Chart.js.git
+[submodule "public/lib/bootstrap-number-input"]
+	path = public/lib/bootstrap-number-input
+	url = https://github.com/ChalkPE/bootstrap-number-input.git
