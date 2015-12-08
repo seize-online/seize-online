@@ -11,99 +11,12 @@ html(lang='en')
     meta(property='og:type', content='website')
     meta(property='og:title', content='seize.online')
     meta(property='og:description', content='Developed by @ChalkPE')
-    link(rel='icon', type='image/png', href='assets/favicon.png')
     link(rel='stylesheet', href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css')
     link(rel='stylesheet', href='/css/style.css')
   body
     #sketch
-    #toolbar
-      button#pauseButton.btn.btn-lg.btn-primary Pause
-      button#navigationToggleButton.btn.btn-lg.btn-warning Show navigation
-      button#powerTextToggleButton.btn.btn-lg.btn-warning Show power text
-      #chartDropdown.dropup(style='display: inline-block;')
-        button#chartDropdownButton.btn.btn-info.btn-lg.dropdown-toggle(type='button', data-toggle='dropdown', aria-haspopup='true', aria-expanded='false')
-          | Power 
-          span.caret
-        ul.dropdown-menu(aria-labelledby='chartDropdownMenu')
-          li
-            a#chartWhatButton(href='#', what='power') Power
-          li
-            a#chartWhatButton(href='#', what='average') Average
-          li
-            a#chartWhatButton(href='#', what='energeFields') Energe
-          li
-            a#chartWhatButton(href='#', what='fields') Fields
-      #rightButtons(style='float: right;')
-        button#backButton.btn.btn-lg.btn-danger Back to title
-        button#restartButton.btn.btn-lg.btn-danger Restart
-        button#timer.btn.btn-lg.disabled @ChalkPE
-    #navigation
-      table#status.table.table-striped-dark
-        thead
-          tr
-            th COLOR
-            th POWER
-            th AVERAGE
-            th ENERGE
-            th FIELDS
-        tbody
-    #container
-      .title(style='font-size: 72px; margin: 25px;') seize.online
-      #optionBox
-        .title Select your color
-        #colorGroup.btn-group(role='group', aria-label='...')
-      #optionBox
-        p.title Adjust game options
-        #fieldCountWrapper.btn-group.numberWrapper
-          input#fieldCountNumber.form-control.input-lg(type='number', value='33', min='1', max='111', step='2', placeholder='Fields count')
-        br
-        #energePercentageWrapper.btn-group.numberWrapper
-          input#energePercentageNumber.form-control.input-lg(type='number', value='5', min='0', max='20', placeholder='Energe field percentage')
-        br
-        #intervalWrapper.btn-group.numberWrapper
-          input#intervalNumber.form-control.input-lg(type='number', value='5', min='1', max='80', placeholder='Game speed')
-        br
-      #optionBox
-        #keybindingTableWrapper.btn-group.col-md-3
-          table#keybindingTable.table.table-bordered-dark.table-striped-dark
-            thead
-              tr
-                th Action
-                th Keybinding
-            tbody
-              tr
-                td Pause & resume
-                td
-                  kbd Space
-              tr
-                td Toggle navigation
-                td
-                  kbd Enter
-                  |  or 
-                  kbd Q
-              tr
-                td Toggle power text
-                td
-                  kbd Alt
-              tr
-                td Restart
-                td
-                  kbd ESC
-                  |  or 
-                  kbd `
-              tr
-                td Set target field
-                td
-                  kbd Click
-              tr
-                td Remove energe field
-                td
-                  kbd Shift + Click
-              tr
-                td Explode energe field
-                td
-                  kbd Ctrl + Click
-    a#copyright(href='/?gallery') Developed by @ChalkPE
+    block content
+    a#copyright(href='http://chalk.pe') Developed by @ChalkPE
     a#refs
     script(src='https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js')
     script(src='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js')
