@@ -79,10 +79,13 @@ Sketch.install(this);
 var sketch = null;
 
 var Main = {
+    isHost: false,
     showPowerText: false,
     backgroundColor: "#222222",
 
     startGame: function(){
+        if(!onMainMenu) Main.isHost = true;
+
         if(sketch !== null) sketch.destroy();
         sketch = Sketch.create({
             container: $("#sketch")[0], globals: false,
@@ -95,7 +98,7 @@ var Main = {
 
         var colors = shuffleArray(Nation.STANDARD);
         colors.forEach(function(standard){
-            Map.setNation(standard.color, new Nation(standard.color, standard.dark, standard.name));
+            Map.setNation(standard.color, new Nation(standard.index, standard.color, standard.dark, standard.name));
         });
 
         if(Map.getPlayerNation() !== null) Map.getPlayerNation().name = "You";
@@ -119,12 +122,16 @@ var Main = {
                 Map.setField(sideField.getX(), sideField.getY(), sideField);
             }, true);
         });
-        Main.whatChart = "power";
+
+        Main.emitFields();
+        Main.emitNations();
 
         Main.logger = new Logger();
         $("#sketch .sketch").show();
         $("#sketch #chart").remove();
         $("#toolbar #chartDropdown").hide();
+        Main.whatChart = "power";
+
         $("#powerTextToggleButton").show();
         $("#backButton").show();
 
@@ -153,17 +160,21 @@ var Main = {
         $("#pauseButton").prop("disabled", false);
     },
 
-    /*requestFullscreen: function(){
-        if(screenfull.enabled && !screenfull.isFullscreen){
-            screenfull.request($("html")[0]);
-            return true;
-        }else return false;
+    emitFields: function(force){
+        if(Main.isHost){
+            if(force) force.__forceUpdated = true;
+            socket.emit("update fields", JSON.stringify(Map.fields));
+            if(force) force.__forceUpdated = false;
+        }
     },
-    startGameFullscreen: function(){
-        if(Main.requestFullscreen()) setTimeout(function(){ Main.startGame(); }, 250);
-        else Main.startGame();
-    },*/
-
+    emitNations: function(force){
+        if(Main.isHost){
+            if(force) force.__forceUpdated = true;
+            socket.emit("update nations", JSON.stringify(Map.nations));
+            if(force) force.__forceUpdated = false;
+        }
+    },
+    
     drawTitleMessage: function(titleMessage){
         Main.titleMessage = titleMessage || Main.titleMessage;
         if(!Main.titleMessage) return;
@@ -236,11 +247,15 @@ var Main = {
 
             if(seconds <= 0) Main.launchGame();
             else Main.titleMessage = seconds;
-        }else Map.forEachFields(function(field, x, y){
-            field.update(sketch);
-        }, true);
+        }else if(Main.isHost || onMainMenu){
+            Map.forEachFields(function(field, x, y){
+                field.__updated = false;
+                field.update();
+            }, true);
+        }
 
         Map.forEachNations(function(nation){
+            nation.__updated = false;
             nation.resetCounter();
         }, true);
 
@@ -260,8 +275,11 @@ var Main = {
 
         if(Main.countdown === null) Map.forEachNations(function(nation){
             if(nation.totalFields.length <= 0) nation.onDestroy();
-            else nation.tick();
+            else if(Main.isHost || onMainMenu) nation.tick();
         }, true);
+
+        Main.emitFields();
+        Main.emitNations();
 
         if(Main.countdown === null){
             var elapsed = floor(abs(Date.now() - Main.startedTime - Main.pausedTime) / 1000);
@@ -290,8 +308,10 @@ var Main = {
         var clickedField = Map.getField(x, y);
         if(clickedField !== null && clickedField instanceof Field && clickedField.onClick()) return;
 
-        if(sketch.running /* && clickedField === Map.lastClickedField && abs(Date.now() - Map.lastClickedTime) < 3000*/){
+        if(sketch.running && (onMainMenu || Main.isHost)){
             Map.getPlayerNation().targetField = (clickedField === Map.getPlayerNation().getTargetField()) ? null : clickedField;
+            Main.emitNations(Map.getPlayerNation());
+
             clickedField = null;
         }
 
@@ -307,8 +327,8 @@ var Map = {
         return "[object Map]";
     },
     init: function(){
-        Map.fields = [];
-        Map.nations = [];
+        Map.fields = {};
+        Map.nations = {};
 
         var fieldCount = parseInt($("#fieldCountNumber").val());
         Map.fieldSize = floor(min(sketch.width, sketch.height) / (fieldCount || 33));
@@ -347,7 +367,7 @@ var Map = {
         });
     },
 
-    fields: [],
+    fields: {},
     getField: function(x, y){
         if(x < 0 || y < 0 || x >= Map.width || y >= Map.height) return null;
         return this.fields[x + ':' + y] || null;
@@ -380,7 +400,7 @@ var Map = {
         }
     },
 
-    nations: [],
+    nations: {},
     getNation: function(color){
         return this.nations[color] || null;
     },
@@ -461,31 +481,34 @@ Logger.prototype.toChartData = function(what, step){
 
 /* ================================================================================================================================ */
 
-function Nation(color, darkColor, name){
+function Nation(index, color, darkColor, name){
+    this.index = index;
     this.color = color;
     this.darkColor = darkColor || color;
     this.name = name;
 
+    this.__updated = true;
     this.resetCounter();
 }
 
 Nation.STANDARD = [
-    //{color: "#F44336", dark: "#D32F2F", name: "Red",    text: "#fff"},
-      {color: "#E91E63", dark: "#C2185B", name: "Pink",   text: "#fff"},
-      {color: "#9C27B0", dark: "#7B1FA2", name: "Purple", text: "#fff"},
-      {color: "#3F51B5", dark: "#303F9F", name: "Indigo", text: "#fff"},
-    //{color: "#2196F3", dark: "#1976D2" name: "Blue",    text: "#fff"},
-      {color: "#009688", dark: "#00796B", name: "Teal",   text: "#000"},
-      {color: "#8BC34A", dark: "#689F38", name: "Green",  text: "#000"}, //Light Green
-      {color: "#FFC107", dark: "#FFA000", name: "Amber",  text: "#000"},
-    //{color: "#FF9800", dark: "#F57C00", name: "Orange", text: "#000"},
-      {color: "#795548", dark: "#5D4037", name: "Brown",  text: "#fff"},
-      {color: "#607D8B", dark: "#455A64", name: "Grey",   text: "#fff"} //Blue Grey
+    {index: 0, color: "#E91E63", dark: "#C2185B", name: "Pink",   text: "#fff"},
+    {index: 1, color: "#9C27B0", dark: "#7B1FA2", name: "Purple", text: "#fff"},
+    {index: 2, color: "#3F51B5", dark: "#303F9F", name: "Indigo", text: "#fff"},
+    {index: 3, color: "#009688", dark: "#00796B", name: "Teal",   text: "#000"},
+    {index: 4, color: "#8BC34A", dark: "#689F38", name: "Green",  text: "#000"}, //Light Green
+    {index: 5, color: "#FFC107", dark: "#FFA000", name: "Amber",  text: "#000"},
+    {index: 6, color: "#795548", dark: "#5D4037", name: "Brown",  text: "#fff"},
+    {index: 7, color: "#607D8B", dark: "#455A64", name: "Grey",   text: "#fff"} //Blue Grey
 ];
 
 Nation.prototype.toString = function(){
     return "[object Nation]";
 };
+Nation.prototype.toJSON = function(){
+    return (this.__updated || this.__forceUpdated) ? [this.getTargetField() ? [this.getTargetField().getX(), this.getTargetField().getY()] : null] : undefined;
+};
+
 Nation.prototype.getColor = function(){
     return this.color;
 };
@@ -526,13 +549,18 @@ Nation.prototype.tick = function(){
                 )) that.targetField = f;
             }
         }, true, field.getX() - range, field.getX() + range, field.getY() - range, field.getY() + range);
-    }else if(this.totalBorderFields.every(function(borderField){
-        return borderField.distance(that.targetField) > floor(min(Map.width, Map.height) * 0.5); //too far
-    })) this.targetField = null;
+
+        if(this.getTargetField()) Main.emitFields(this);
+    }else if(this.totalBorderFields.every(function(borderField){ return borderField.distance(that.targetField) > floor(min(Map.width, Map.height) * 0.5); })){
+        this.targetField = null;
+        Main.emitFields(this);
+    }
 };
 Nation.prototype.onInvade = function(field){
+    field.__updated = true;
     if(field === this.targetField){
         this.targetField = null;
+        this.__updated = true;
     }
 };
 Nation.prototype.onDestroy = function(){
@@ -569,6 +597,8 @@ function Field(x, y, power, nation){
     this.y = y;
     this.power = power || 0;
     this.nation = nation || null;
+
+    this.__updated = true;
 }
 
 //  * N N *
@@ -584,30 +614,38 @@ Field.CORNERS = [
     /* 3 */ [Direction.NORTH, Direction.NORTHWEST, Direction.WEST, 2, 1, 0]
 ];
 
-Field.synchronizePower = function(a, b){
+Field.synchronizePower = function(a, b, force){
     var sum = a.getPower() + b.getPower();
-    if(sum >= 5 && !a.isEmpty()){
+
+    if(!force && sum >= 5 && !a.isEmpty()){
         var targetField = a.getNation().getTargetField();
 
         var aDistance = a.distance(targetField);
         var bDistance = b.distance(targetField);
+
         if(!isEqualNumber(aDistance, bDistance)){
             var nearField = aDistance < bDistance ? a : b;
             var farField  = aDistance < bDistance ? b : a;
 
-            nearField.power = floor(sum * 4 / 5);
-            farField.power = sum - nearField.power;
+            farField.power = floor(sum / 5);
+            nearField.power = sum - farField.power;
+
+            farField.__updated = nearField.__updated = true;
             return;
         }
     }
 
     a.power = floor(sum / 2);
     b.power = sum - a.power;
+    a.__updated = b.__updated = true;
 };
 
 Field.prototype = {
     toString: function(){
         return "[object Field]";
+    },
+    toJSON: function(){
+        return (this.__updated || this.__forceUpdated) ? [this.getPower(), this.isEmpty() ? -1 : this.getNation().index] : undefined;
     },
 
     getX: function(){
@@ -881,7 +919,10 @@ Field.prototype = {
         else this.contactWithTerritory(sideField);
     },
     contactWithEmptyField: function(field){
-        if(this.power <= 500) return; this.power -= 500;
+        if(this.power <= 500) return;
+
+        this.power -= 500;
+        this.__updated = true;
 
         //extend my territory
         field.nation = this.getNation();
@@ -896,7 +937,10 @@ Field.prototype = {
 
         //enemy's territory
         else if(this.getNation() !== energeField.getNation()){
-            if(this.power <= 400) return; this.power -= 400;
+            if(this.power <= 400) return;
+
+            this.power -= 400;
+            this.__updated = true;
 
             //invade!
             energeField.nation = this.getNation();
@@ -913,6 +957,8 @@ Field.prototype = {
         //enemy's territory and enough money to invade
         else if(this.getPower() > territoryField.getPower() && this.getPower() > 300){
             this.power -= 300;
+            this.__updated = true;
+
             territoryField.power = floor(territoryField.power * 0.8);
 
             //invade!
@@ -933,6 +979,10 @@ EnergeField.prototype = new Field();
 EnergeField.prototype.constructor = EnergeField;
 EnergeField.prototype.toString = function(){
     return "[object EnergeField]";
+};
+EnergeField.prototype.toJSON = function(){
+    var superJSON = Field.prototype.toJSON.call(this);
+    return (superJSON === undefined) ? undefined : superJSON.concat(this.level);
 };
 
 EnergeField.prototype.drawAnything = function(context){
@@ -955,7 +1005,10 @@ EnergeField.prototype.drawAnything = function(context){
     this.drawArc(context, "fill", 0.7);
 };
 EnergeField.prototype.update = function(){
-    if(!this.isEmpty()) this.power += floor((this.level ? 20 : 5) + random(10));
+    if(!this.isEmpty()){
+        this.power += floor((this.level ? 20 : 5) + random(10));
+        this.__updated = true;
+    }
 
     var that = this;
     this.forEachSides(function(sideField, direction){
@@ -979,11 +1032,65 @@ EnergeField.prototype.onClick = function(){
             Map.setField(x, y, new Field(x, y));
             Map.forEachFields(function(field, x, y){
                 field.power = max(1, floor(field.power * 0.01));
+                field.__updated = true;
             }, true, x - 5, x + 6, y - 5, y + 6);
             return true;
         }
     }
 }
+
+/* ================================================================================================================================ */
+
+var isVirgin = true;
+
+var socket = io.connect();
+socket.on('update fields', function(data){
+    if(Main.isHost || onMainMenu) return; data = JSON.parse(data);
+    if(isVirgin){
+        Map.forEachFields(function(f, x, y){
+            Map.setField(x, y, new Field(x, y));
+        });
+        isVirgin = false;
+    }
+
+    for(var key in data){
+        if(!data.hasOwnProperty(key)) continue;
+
+        var axis = key.split(":");
+        var x = parseInt(axis[0]);
+        var y = parseInt(axis[1]);
+
+        var fieldJSON = data[key];
+        var power = fieldJSON[0];
+        var nation = (fieldJSON[1] < 0) ? null : Map.getNation(Nation.STANDARD[fieldJSON[1]].color);
+
+        var field = Map.getField(x, y);
+        if(fieldJSON.length === 3 && (field === null || !(field instanceof EnergeField))){
+            Map.setField(x, y, new EnergeField(x, y, power, nation, fieldJSON[2]));
+        }else if(fieldJSON.length === 2 && (field === null || (field instanceof EnergeField))){
+            Map.setField(new Field(x, y, power, nation));
+        }else{
+            field.power = power;
+            field.nation = nation;
+        }
+    }
+});
+socket.on('update nations', function(data){
+    if(Main.isHost || onMainMenu) return; data = JSON.parse(data);
+
+    for(var key in data){
+        if(!data.hasOwnProperty(key)) continue;
+
+        var nationJSON = data[key];
+        if(nationJSON === null) Map.setNation(key, null);
+        else{
+            var nation = Map.getNation(key);
+            if(nationJSON[0] === null) nation.targetField = null;
+            else nation.targetField = Map.getField(nationJSON[0][0], nationJSON[0][1]);
+        }
+
+    }
+});
 
 /* ================================================================================================================================ */
 
@@ -1118,6 +1225,7 @@ $("#backButton").click(function(){
     $("#refs").show();
 
     onMainMenu = true;
+    Main.isHost = false;
     Main.startGame();
 });
 
