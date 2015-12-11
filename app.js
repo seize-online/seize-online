@@ -22,28 +22,22 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', routes);
 
-app.use(function(req, res, next) {
-  var err = new Error('Not Found');
-  err.status = 404;
-  next(err);
+app.use(function(req, res, next){
+    var err = new Error('Not Found');
+    err.status = 404;
+    next(err);
 });
 
-if (app.get('env') === 'development') {
-  app.use(function(err, req, res, next) {
-    res.status(err.status || 500);
-    res.render('error', {
-      message: err.message,
-      error: err
+if(app.get('env') === 'development'){
+    app.use(function(err, req, res, next){
+        res.status(err.status || 500);
+        res.render('error', { message: err.message, error: err });
     });
-  });
 }
 
-app.use(function(err, req, res, next) {
-  res.status(err.status || 500);
-  res.render('error', {
-    message: err.message,
-    error: {}
-  });
+app.use(function(err, req, res, next){
+    res.status(err.status || 500);
+    res.render('error', { message: err.message, error: {} });
 });
 
 var debug = require('debug')('seize-online:server');
@@ -73,28 +67,21 @@ server.listen(app.get('port'), function(){
     console.log('Listening on port ' + app.get('port'));
 });
 
-server.on('error', onError);
+server.on('error', function(error){
+    if(error.syscall !== 'listen') throw error;
 
-function onError(error) {
-  if (error.syscall !== 'listen') {
-    throw error;
-  }
+    var bind = (typeof port === 'string') ? ('Pipe ' + port) : ('Port ' + port);
+    switch(error.code){
+        case 'EACCES':
+            console.error(bind + ' requires elevated privileges');
+            process.exit(1);
+            break;
 
-  var bind = typeof port === 'string'
-    ? 'Pipe ' + port
-    : 'Port ' + port;
-
-  // handle specific listen errors with friendly messages
-  switch (error.code) {
-    case 'EACCES':
-      console.error(bind + ' requires elevated privileges');
-      process.exit(1);
-      break;
-    case 'EADDRINUSE':
-      console.error(bind + ' is already in use');
-      process.exit(1);
-      break;
-    default:
-      throw error;
-  }
-}
+        case 'EADDRINUSE':
+            console.error(bind + ' is already in use');
+            process.exit(1);
+            break;
+        default:
+            throw error;
+    }
+});
