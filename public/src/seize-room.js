@@ -28,25 +28,15 @@ Nation.STANDARD.forEach(function(standard){
     }); $("#colorGroup > button").width(maxWidth);
 });
 
+var selectedStandard = null;
 $("button#colorButton").click(function(){
-    $("#container").hide("slow");
-    $("#copyright").hide("slow");
-    $("#refs").hide("fast");
-
-    $("#toolbar").show();
-    $("#sketch").css("bottom", $("#toolbar").outerHeight() + "px");
-
-    $("#timer").css("color", $(this).css("color"));
-    $("#timer").css("border-color", $(this).css("border-color"));
-    $("#timer").css("background-color", $(this).css("background-color"));
+    $("button#colorButton").prop('disabled', false);
+    $(this).prop('disabled', true);
 
     var name = $(this).text();
     Nation.STANDARD.forEach(function(standard){
-        if(standard.name === name) Map.playerColor = standard.color;
+        if(standard.name === name) selectedStandard = standard;
     });
-
-    onMainMenu = false;
-    Main.startGame();
 });
 
 bootstrapNumber("#fieldCountNumber", {
@@ -62,3 +52,8 @@ bootstrapNumber("#intervalNumber", {
     upText: "Slower", downText: "Faster", center: true
 });
 $(".numberWrapper").width($("#colorGroup").width());
+
+/* ================================================================================================================================ */
+
+onMainMenu = true;
+Main.startGame();

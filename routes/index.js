@@ -10,8 +10,7 @@ fs.readFile(path.join(__dirname, '..', '.git', 'refs', 'heads', 'master'), 'utf-
     hash = data.toString();
 });
 
-/* GET home page. */
-router.get('/', function(req, res, next) {
+router.get('/', function(req, res, next){
     res.render('index', {
         title: 'seize.online',
         hash: hash
