@@ -2,6 +2,7 @@ extends layout
 
 block scripts
     - var menu = 'index';
+    - var onMainMenu = true;
 
 block content
     #container
@@ -9,5 +10,5 @@ block content
         .col-md-offset-5.col-md-2.well
             button.btn.btn-primary.btn-lg.btn-block#singleplayButton Singleplayer
             button.btn.btn-warning.btn-lg.btn-block#multiplayButton Multiplayer
-            button.btn.btn-danger.btn-lg.btn-block#settingsButton Settings
+            button.btn.btn-danger.btn-lg.btn-block#settingsButton Help
     a#refs= hash

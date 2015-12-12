@@ -6,7 +6,7 @@ html, body {
     background-color: #222222; z-index: -2;
 }
 
-div, a {
+div, a, td {
     font-family: 'Quantico', 'Nanum Gothic', serif; text-decoration: none;
 }
 
@@ -87,10 +87,6 @@ div, a {
     margin-bottom: 20px;
 }
 
-#keybindingTableWrapper {
-    float: none; margin: 0 auto;
-}
-
 #keybindingTable {
-    position: relative; color: #CCCCCC;
+    color: #CCCCCC;
 }

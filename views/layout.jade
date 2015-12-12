@@ -25,3 +25,9 @@ html(lang='en')
     script(src='/src/seize.js', charset='utf-8')
     if menu
         script(src='/src/seize-#{menu}.js', charset='utf-8')
+    if onMainMenu
+        script.
+            $(function(){
+                Main.onMainMenu = true;
+                Main.startGame();
+            });

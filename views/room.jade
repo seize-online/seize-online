@@ -2,6 +2,7 @@ extends layout
 
 block scripts
     - var menu = 'room';
+    - var onMainMenu = true;
     script(src='/lib/bootstrap-number-input/bootstrap-number-input.js')
 
 block content
@@ -20,44 +21,3 @@ block content
             br
             #intervalWrapper.btn-group.numberWrapper
                 input#intervalNumber.form-control.input-lg(type='number', value='5', min='1', max='80', placeholder='Game speed')
-            br
-        #optionBox
-            #keybindingTableWrapper.btn-group.col-md-3
-                table#keybindingTable.table.table-bordered-dark.table-striped-dark
-                    thead
-                        tr
-                            th Action
-                            th Keybinding
-                    tbody
-                        tr
-                            td Pause & resume
-                            td
-                                kbd Space
-                        tr
-                            td Toggle navigation
-                            td
-                                kbd Enter
-                                | &nbsp;or&nbsp;
-                                kbd Q
-                        tr
-                            td Toggle power text
-                            td
-                                kbd Alt
-                        tr
-                            td Restart
-                            td
-                                kbd ESC
-                                | &nbsp;or&nbsp;
-                                kbd `
-                        tr
-                            td Set target field
-                            td
-                                kbd Click
-                        tr
-                            td Remove energe field
-                            td
-                                kbd Shift + Click
-                        tr
-                            td Explode energe field
-                            td
-                                kbd Ctrl + Click

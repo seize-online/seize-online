@@ -88,9 +88,9 @@ var Main = {
         sketch = Sketch.create({
             container: $("#sketch")[0], globals: false,
             fullscreen: false, autostart: false, autopause: false, interval: 5,
-            width: window.innerWidth, height: window.innerHeight - (onMainMenu ? 0 : $("#toolbar").outerHeight())
+            width: window.innerWidth, height: window.innerHeight - (Main.onMainMenu ? 0 : $("#toolbar").outerHeight())
         });
-        $("#sketch").css("bottom", onMainMenu ? "0px" : "")
+        $("#sketch").css("bottom", Main.onMainMenu ? "0px" : "")
 
         Map.init();
 
@@ -137,7 +137,7 @@ var Main = {
         $("#pauseButton").prop("disabled", true);
         $("#pauseButton").text("Pause");
 
-        Main.countdown = (onMainMenu ? 0 : Date.now() + 6000); //6s later
+        Main.countdown = (Main.onMainMenu ? 0 : Date.now() + 6000); //6s later
         Main.titleMessage = null;
         $("#timer").text("00:00");
 
@@ -189,7 +189,7 @@ var Main = {
         sketch.fillText(Main.titleMessage, sketch.width / 2, sketch.height / 2);
     },
     onGameOver: function(win){
-        if(onMainMenu){
+        if(Main.onMainMenu){
             setTimeout(function(){
                 Main.startGame();
             }, floor(random(4000, 6000)));
@@ -243,7 +243,7 @@ var Main = {
 
             if(seconds <= 0) Main.launchGame();
             else Main.titleMessage = seconds;
-        }else if(Main.isHost || onMainMenu){
+        }else if(Main.isHost || Main.onMainMenu){
             Map.forEachFields(function(field, x, y){
                 field.__updated = false;
                 field.update();
@@ -271,7 +271,7 @@ var Main = {
 
         if(Main.countdown === null) Map.forEachNations(function(nation){
             if(nation.totalFields.length <= 0) nation.onDestroy();
-            else if(Main.isHost || onMainMenu) nation.tick();
+            else if(Main.isHost || Main.onMainMenu) nation.tick();
         }, true);
 
         Main.emitFields();
@@ -287,7 +287,7 @@ var Main = {
         }
     },
     __keydown: function(){
-        if(onMainMenu) return;
+        if(Main.onMainMenu) return;
 
         if(sketch.keys.SPACE) $("#pauseButton").click();
         if(sketch.keys.ESCAPE || sketch.keys[192 /* ` */]) $("#restartButton").click();
@@ -296,7 +296,7 @@ var Main = {
         if(sketch.keys.ENTER || sketch.keys.Q) $("#navigationToggleButton").click();
     },
     __mousedown: function(){
-        if(onMainMenu || Main.countdown !== null) return;
+        if(Main.onMainMenu || Main.countdown !== null) return;
 
         var x = floor((sketch.mouse.x - Map.leftPadding) / Map.fieldSize);
         var y = floor((sketch.mouse.y - Map.topPadding)  / Map.fieldSize);
@@ -304,7 +304,7 @@ var Main = {
         var clickedField = Map.getField(x, y);
         if(clickedField !== null && clickedField instanceof Field && clickedField.onClick()) return;
 
-        if(sketch.running && (onMainMenu || Main.isHost)){
+        if(sketch.running && (Main.onMainMenu || Main.isHost)){
             Map.getPlayerNation().targetField = (clickedField === Map.getPlayerNation().getTargetField()) ? null : clickedField;
             Main.emitNations(Map.getPlayerNation());
 
@@ -566,7 +566,7 @@ Nation.prototype.onDestroy = function(){
     if(this.isPlayer()) return Main.onGameOver(false);
 
     var nations = []; Map.forEachNations(function(nation){ nations.push(nation); }, true);
-    if(nations.length === 1 && (onMainMenu || nations[0].isPlayer())) Main.onGameOver(true);
+    if(nations.length === 1 && (Main.onMainMenu || nations[0].isPlayer())) Main.onGameOver(true);
 };
 
 Nation.prototype.draw = function(context){
@@ -858,7 +858,7 @@ Field.prototype = {
         //Not implemented
     },
     drawPowerText: function(context){
-        if(onMainMenu || !Main.showPowerText) return;
+        if(Main.onMainMenu || !Main.showPowerText) return;
 
         context.fillStyle = Main.backgroundColor;
         this.drawText(context, "fill", this.getPower());
@@ -1043,7 +1043,7 @@ var isVirgin = true;
 
 var socket = io.connect();
 socket.on('update fields', function(data){
-    if(Main.isHost || onMainMenu) return; data = JSON.parse(data);
+    if(Main.isHost || Main.onMainMenu) return; data = JSON.parse(data);
     if(isVirgin){
         Map.forEachFields(function(f, x, y){
             Map.setField(x, y, new Field(x, y));
@@ -1074,7 +1074,7 @@ socket.on('update fields', function(data){
     }
 });
 socket.on('update nations', function(data){
-    if(Main.isHost || onMainMenu) return; data = JSON.parse(data);
+    if(Main.isHost || Main.onMainMenu) return; data = JSON.parse(data);
 
     for(var key in data){
         if(!data.hasOwnProperty(key)) continue;

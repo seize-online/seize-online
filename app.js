@@ -1,16 +1,14 @@
+var http = require('http');
 var express = require('express');
 var path = require('path');
 var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
-
-var routes = require('./routes/index');
-var room = require('./routes/room');
-var play = require('./routes/play');
+var debug = require('debug')('seize-online:server');
 
 var app = express();
-
+app.set('port', process.env.PORT || '3000');
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 
@@ -21,9 +19,10 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/', routes);
-app.use('/room', room);
-app.use('/play', play);
+app.use('/', require('./routes/index'));
+app.use('/room', require('./routes/room'));
+app.use('/play', require('./routes/play'));
+app.use('/help', require('./routes/help'));
 
 app.use(function(req, res, next){
     var err = new Error('Not Found');
@@ -43,9 +42,6 @@ app.use(function(err, req, res, next){
     res.render('error', { message: err.message, error: {} });
 });
 
-var debug = require('debug')('seize-online:server');
-var http = require('http');
-
 var server = http.createServer(app);
 var io = require('socket.io')(server);
 
@@ -63,7 +59,6 @@ io.on('connection', function(socket){
     });
 });
 
-app.set('port', process.env.PORT || '3000');
 server.listen(app.get('port'), function(){
     console.log('Listening on port ' + app.get('port'));
 });
