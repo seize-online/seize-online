@@ -146,7 +146,7 @@ var Main = {
         sketch.keydown = Main.__keydown;
         sketch.mousedown = Main.__mousedown;
 
-        sketch.interval = parseInt($("#intervalNumber").val());
+        sketch.interval = (65 - parseInt($("#intervalNumber").val())) || 5;
         sketch.start();
     },
     launchGame: function(){

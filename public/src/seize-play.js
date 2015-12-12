@@ -1,15 +1,14 @@
-$(function(){
-    $("#copyright").hide("slow");
-    $("#refs").hide("fast");
-
-    $("#sketch").css("bottom", $("#toolbar").outerHeight() + "px");
-
-    onMainMenu = false;
-    Main.startGame();
-});
+/* =============================== window =============================== */
 
 $(window).bind("beforeunload", function(){
     return "You will lose all the game progess.";
+});
+
+$(function(){
+    $("#sketch").css("bottom", $("#toolbar").outerHeight() + "px");
+    
+    $("#copyright").hide("slow");
+    $("#refs").hide("fast");
 });
 
 /* =============================== #navigation =============================== */

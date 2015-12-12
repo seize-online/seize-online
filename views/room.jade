@@ -10,11 +10,10 @@ block container
         #colorGroup.btn-group(role='group', aria-label='...')
     #optionBox
         p.title Adjust game options
-        #fieldCountWrapper.btn-group.numberWrapper
-            input#fieldCountNumber.form-control.input-lg(type='number', value='33', min='1', max='111', step='2', placeholder='Fields count')
-        br
-        #energePercentageWrapper.btn-group.numberWrapper
-            input#energePercentageNumber.form-control.input-lg(type='number', value='5', min='0', max='20', placeholder='Energe field percentage')
-        br
-        #intervalWrapper.btn-group.numberWrapper
-            input#intervalNumber.form-control.input-lg(type='number', value='5', min='1', max='80', placeholder='Game speed')
+        .row
+            .btn-group.col-md-2.col-md-offset-3
+                input#fieldCountNumber.form-control.input-lg(type='number', value='33', min='1', max='77', step='2', placeholder='Map size')
+            .btn-group.col-md-2
+                input#energePercentageNumber.form-control.input-lg(type='number', value='5', min='0', max='32', placeholder='Richness')
+            .btn-group.col-md-2
+                input#intervalNumber.form-control.input-lg(type='number', value='60', min='1', max='64', placeholder='Game speed')
