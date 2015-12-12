@@ -1,23 +1,20 @@
-extends layout
+extends page
 
-block scripts
+append scripts
     - var menu = 'room';
-    - var onMainMenu = true;
     script(src='/lib/bootstrap-number-input/bootstrap-number-input.js')
 
-block content
-    #container
-        .title(style='font-size: 72px; margin: 25px;')= title
-        #optionBox
-            .title Select your color
-            #colorGroup.btn-group(role='group', aria-label='...')
-        #optionBox
-            p.title Adjust game options
-            #fieldCountWrapper.btn-group.numberWrapper
-                input#fieldCountNumber.form-control.input-lg(type='number', value='33', min='1', max='111', step='2', placeholder='Fields count')
-            br
-            #energePercentageWrapper.btn-group.numberWrapper
-                input#energePercentageNumber.form-control.input-lg(type='number', value='5', min='0', max='20', placeholder='Energe field percentage')
-            br
-            #intervalWrapper.btn-group.numberWrapper
-                input#intervalNumber.form-control.input-lg(type='number', value='5', min='1', max='80', placeholder='Game speed')
+block container
+    #optionBox
+        .title Select your color
+        #colorGroup.btn-group(role='group', aria-label='...')
+    #optionBox
+        p.title Adjust game options
+        #fieldCountWrapper.btn-group.numberWrapper
+            input#fieldCountNumber.form-control.input-lg(type='number', value='33', min='1', max='111', step='2', placeholder='Fields count')
+        br
+        #energePercentageWrapper.btn-group.numberWrapper
+            input#energePercentageNumber.form-control.input-lg(type='number', value='5', min='0', max='20', placeholder='Energe field percentage')
+        br
+        #intervalWrapper.btn-group.numberWrapper
+            input#intervalNumber.form-control.input-lg(type='number', value='5', min='1', max='80', placeholder='Game speed')

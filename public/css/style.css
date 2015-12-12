@@ -10,6 +10,11 @@ div, a, td {
     font-family: 'Quantico', 'Nanum Gothic', serif; text-decoration: none;
 }
 
+a:hover, a:focus {
+    color: inherit;
+    text-decoration: none;
+}
+
 .title {
     margin: 5px; color: #E0E4CC; text-shadow: 3px 3px 3px #111111; font-size: 32px;
 }
@@ -37,6 +42,16 @@ div, a, td {
     font-size: 18px; text-shadow: 2px 2px 2px #151515; text-align: center; font-family: 'Inconsolata';
 }
 
+.well > .table {
+    margin-bottom: 0px;
+}
+.well > .table > caption {
+    padding-top: 0px;
+}
+.table > thead > tr > th {
+    font-size: 15px; text-align: center !important;
+}
+
 .table-bordered-dark {
     border: 1px solid #555;
 }
@@ -45,15 +60,14 @@ div, a, td {
     margin-bottom: auto;
 }
 
-.table-striped-dark>tbody>tr:nth-of-type(odd) {
+.table-striped-dark > tbody > tr:nth-of-type(odd) {
     background-color: rgba(32, 32, 32, 0.6);
 }
-.table-striped-dark>tbody>tr>td {
+.table-striped-dark > tbody > tr > td {
     border-top: 1px solid #555;
 }
-.table-striped-dark>thead>tr>th {
-    font-size: 15px; color: #ddd; text-align: center !important;
-    border-bottom: 2px solid #555;
+.table-striped-dark > thead > tr > th {
+    color: #ddd; border-bottom: 2px solid #555;
 }
 
 #sketch {
@@ -85,8 +99,4 @@ div, a, td {
 
 .numberWrapper:not(:last-of-type) {
     margin-bottom: 20px;
-}
-
-#keybindingTable {
-    color: #CCCCCC;
 }

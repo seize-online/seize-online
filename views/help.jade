@@ -1,47 +1,43 @@
-extends layout
+extends page
 
-block scripts
-    - var onMainMenu = true;
-    
-block content
-    #container
-        .title(style='font-size: 72px; margin: 25px;')= title
-        .col-md-offset-4.col-md-4
-            table#keybindingTable.table.table-bordered-dark.table-striped-dark
-                thead
-                    tr
-                        th Action
-                        th Keybinding
-                tbody
-                    tr
-                        td Pause & resume
-                        td
-                            kbd Space
-                    tr
-                        td Toggle navigation
-                        td
-                            kbd Enter
-                            | &nbsp;or&nbsp;
-                            kbd Q
-                    tr
-                        td Toggle power text
-                        td
-                            kbd Alt
-                    tr
-                        td Restart
-                        td
-                            kbd ESC
-                            | &nbsp;or&nbsp;
-                            kbd `
-                    tr
-                        td Set target field
-                        td
-                            kbd Click
-                    tr
-                        td Remove energe field
-                        td
-                            kbd Shift + Click
-                    tr
-                        td Explode energe field
-                        td
-                            kbd Ctrl + Click
+block container
+    .col-md-offset-4.col-md-4.well
+        table.table.table-bordered.table-striped.table-hover
+            caption Keybindings
+            thead
+                tr
+                    th Action
+                    th Keybinding
+            tbody
+                tr
+                    td Pause & resume
+                    td
+                        kbd Space
+                tr
+                    td Toggle navigation
+                    td
+                        kbd Enter
+                        | &nbsp;or&nbsp;
+                        kbd Q
+                tr
+                    td Toggle power text
+                    td
+                        kbd Alt
+                tr
+                    td Restart
+                    td
+                        kbd ESC
+                        | &nbsp;or&nbsp;
+                        kbd `
+                tr
+                    td Set target field
+                    td
+                        kbd Click
+                tr
+                    td Remove energe field
+                    td
+                        kbd Shift + Click
+                tr
+                    td Explode energe field
+                    td
+                        kbd Ctrl + Click

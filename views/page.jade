@@ -1,0 +1,11 @@
+extends layout
+
+block scripts
+    - var onMainMenu = true;
+
+block content
+    #container
+        h1
+            a.title(href='/', style='font-size: 72px; margin: 25px;')= title
+        br
+        block container
