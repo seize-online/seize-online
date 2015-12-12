@@ -47,11 +47,9 @@ var server = http.createServer(app);
 var io = require('socket.io')(server);
 
 io.on('connection', function(socket){
-    socket.on('message', function(data){
-        console.log(socket.id + ": message: " + data);
+    socket.on('room create', function(data){
+        console.log(data.name);
     });
-
-    //TODO: broadcast target filter
 
     socket.on('update fields', function(data){
         socket.broadcast.emit('update fields', data);

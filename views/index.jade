@@ -1,90 +1,13 @@
 extends layout
 
+block scripts
+    - var menu = 'index';
+
 block content
-  #toolbar
-    button#pauseButton.btn.btn-lg.btn-primary Pause
-    button#navigationToggleButton.btn.btn-lg.btn-warning Show navigation
-    button#powerTextToggleButton.btn.btn-lg.btn-warning Show power text
-    #chartDropdown.dropup(style='display: inline-block;')
-      button#chartDropdownButton.btn.btn-info.btn-lg.dropdown-toggle(type='button', data-toggle='dropdown', aria-haspopup='true', aria-expanded='false')
-        | Power 
-        span.caret
-      ul.dropdown-menu(aria-labelledby='chartDropdownMenu')
-        li
-          a#chartWhatButton(href='#', what='power') Power
-        li
-          a#chartWhatButton(href='#', what='average') Average
-        li
-          a#chartWhatButton(href='#', what='energeFields') Energe
-        li
-          a#chartWhatButton(href='#', what='fields') Fields
-    #rightButtons(style='float: right;')
-      button#backButton.btn.btn-lg.btn-danger Back to title
-      button#restartButton.btn.btn-lg.btn-danger Restart
-      button#timer.btn.btn-lg.disabled @ChalkPE
-  #navigation
-    table#status.table.table-striped-dark
-      thead
-        tr
-          th COLOR
-          th POWER
-          th AVERAGE
-          th ENERGE
-          th FIELDS
-      tbody
-  #container
-    .title(style='font-size: 72px; margin: 25px;')= title
-    #optionBox
-      .title Select your color
-      #colorGroup.btn-group(role='group', aria-label='...')
-    #optionBox
-      p.title Adjust game options
-      #fieldCountWrapper.btn-group.numberWrapper
-        input#fieldCountNumber.form-control.input-lg(type='number', value='33', min='1', max='111', step='2', placeholder='Fields count')
-      br
-      #energePercentageWrapper.btn-group.numberWrapper
-        input#energePercentageNumber.form-control.input-lg(type='number', value='5', min='0', max='20', placeholder='Energe field percentage')
-      br
-      #intervalWrapper.btn-group.numberWrapper
-        input#intervalNumber.form-control.input-lg(type='number', value='5', min='1', max='80', placeholder='Game speed')
-      br
-    #optionBox
-      #keybindingTableWrapper.btn-group.col-md-3
-        table#keybindingTable.table.table-bordered-dark.table-striped-dark
-          thead
-            tr
-              th Action
-              th Keybinding
-          tbody
-            tr
-              td Pause & resume
-              td
-                kbd Space
-            tr
-              td Toggle navigation
-              td
-                kbd Enter
-                |  or 
-                kbd Q
-            tr
-              td Toggle power text
-              td
-                kbd Alt
-            tr
-              td Restart
-              td
-                kbd ESC
-                |  or 
-                kbd `
-            tr
-              td Set target field
-              td
-                kbd Click
-            tr
-              td Remove energe field
-              td
-                kbd Shift + Click
-            tr
-              td Explode energe field
-              td
-                kbd Ctrl + Click
+    #container
+        .title(style='font-size: 72px; margin: 25px;')= title
+        .col-md-offset-5.col-md-2.well
+            button.btn.btn-primary.btn-lg.btn-block Singleplayer
+            button.btn.btn-warning.btn-lg.btn-block Multiplayer
+            button.btn.btn-danger.btn-lg.btn-block Settings
+    a#refs= hash

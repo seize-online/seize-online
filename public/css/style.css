@@ -63,7 +63,7 @@ div, a {
 #container {
     padding: 15px; text-align: center !important;
     background-color: rgba(32, 32, 32, 0.2); color: #333;
-    position: absolute; top: 0px; bottom: 0px; left: 0px; right: 0px;
+    position: absolute; top: 0px; bottom: 0px; left: 0px; right: 0px; margin: auto;
 }
 
 #toolbar {

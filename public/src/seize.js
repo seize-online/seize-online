@@ -84,8 +84,6 @@ var Main = {
     backgroundColor: "#222222",
 
     startGame: function(){
-        if(!onMainMenu) Main.isHost = true;
-
         if(sketch !== null) sketch.destroy();
         sketch = Sketch.create({
             container: $("#sketch")[0], globals: false,
@@ -174,7 +172,7 @@ var Main = {
             if(force) force.__forceUpdated = false;
         }
     },
-    
+
     drawTitleMessage: function(titleMessage){
         Main.titleMessage = titleMessage || Main.titleMessage;
         if(!Main.titleMessage) return;
@@ -240,8 +238,6 @@ var Main = {
         Main.drawTitleMessage();
     },
     __update: function(){
-        //if(onMainMenu) Main.titleMessage = "seize.online";
-
         if(Main.countdown !== null){
             var seconds = floor((Main.countdown - Date.now()) / 1000);
 
@@ -326,7 +322,7 @@ var Map = {
     toString: function(){
         return "[object Map]";
     },
-    init: function(){
+    init: function(noEnerge){
         Map.fields = {};
         Map.nations = {};
 
@@ -346,7 +342,7 @@ var Map = {
         Map.forEachFields(function(field, x, y){
             if(field !== null) return;
 
-            var NewField = (random(100) < ((percentage || 6) - 1)) ? EnergeField : Field;
+            var NewField = (!noEnerge && random(100) < ((percentage || 6) - 1)) ? EnergeField : Field;
             Map.setField(x, y, new NewField(x, y));
         });
     },
@@ -835,7 +831,7 @@ Field.prototype = {
                 }
             }
 
-            for(var i = 0; i < targetFields.length; i++) targetFields[i].drawRoundedCorner(context, targetDirections[i], targetColor);
+            for(var i = 0; i < targetFields.length; i++) if(targetFields[i]) targetFields[i].drawRoundedCorner(context, targetDirections[i], targetColor);
         });
     },
     drawRoundedCorner: function(context, directions, color){
@@ -905,7 +901,7 @@ Field.prototype = {
     },
 
     onClick: function(){
-        console.debug(this);
+        console.log(this);
     },
 
     update: function(){
@@ -1094,26 +1090,6 @@ socket.on('update nations', function(data){
 
 /* ================================================================================================================================ */
 
-var bootstrapNumber = function(selector, options){
-    function changeHandler(){
-        var value = parseInt($(this).val());
-
-        if(isNaN(value)) $(this).val($(this).attr("value"));
-        if(options.min && value < options.min) $(this).val(options.min);
-        if(options.max && value < options.max) $(this).val(options.max);
-    }
-
-    $(selector).bootstrapNumber(options);
-    $(selector).change(changeHandler).focusout(changeHandler).click(function(){
-        $(this).attr("value", $(this).val()); $(this).val("");
-    });
-
-    var maxWidth = max($(selector).prev().children(0).width(), $(selector).children(0).next().width());
-    $(selector).prev().children(0).width(maxWidth); $(selector).next().children(0).width(maxWidth);
-};
-
-/* ================================================================================================================================ */
-
 var onMainMenu = true;
 Main.startGame();
 
@@ -1178,47 +1154,9 @@ $("#powerTextToggleButton").click(function(){
     sketch.draw();
 });
 
-$("#timer").css("opacity", "1.0");
-$("#chartDropdown .dropdown-menu").on('click', 'li a', function(){
-    $("#chartDropdownButton").html($(this).text() + ' <span class="caret" />');
-    Main.whatChart = $(this).attr("what");
-    Main.showChart();
-});
-
-/* =============================== #container =============================== */
-
-Nation.STANDARD.forEach(function(standard){
-    $("#colorGroup").append('<button type="button" class="btn btn-lg" id="colorButton" style="color: ' + standard.text + '; background-color: ' + standard.color + '; border-color: ' + standard.dark + ';">' + standard.name + '</button>');
-
-    var maxWidth = 0; $("#colorGroup > button").each(function(){
-        maxWidth = max(maxWidth, $(this).width());
-    }); $("#colorGroup > button").width(maxWidth);
-});
-
-$("button#colorButton").click(function(){
-    $("#container").hide("slow");
-    $("#copyright").hide("slow");
-    $("#refs").hide("fast");
-
-    $("#sketch").show();
-    $("#toolbar").show();
-    $("#sketch").css("bottom", $("#toolbar").outerHeight() + "px");
-
-    $("#timer").css("color", $(this).css("color"));
-    $("#timer").css("border-color", $(this).css("border-color"));
-    $("#timer").css("background-color", $(this).css("background-color"));
-
-    var name = $(this).text();
-    Nation.STANDARD.forEach(function(standard){
-        if(standard.name === name) Map.playerColor = standard.color;
-    });
-
-    onMainMenu = false;
-    Main.startGame();
-});
-
 $("#backButton").click(function(){
     $("#toolbar").hide("slow");
+    $("#navigation").hide("slow");
 
     $("#container").show();
     $("#copyright").show();
@@ -1233,25 +1171,14 @@ $("#restartButton").click(function(){
     Main.startGame();
 });
 
-bootstrapNumber("#fieldCountNumber", {
-    upClass: "success btn-lg", downClass: "success btn-lg",
-    upText: "+", downText: "-", center: true, min: 15
+$("#timer").css("opacity", "1.0");
+$("#chartDropdown .dropdown-menu").on('click', 'li a', function(){
+    $("#chartDropdownButton").html($(this).text() + ' <span class="caret" />');
+    Main.whatChart = $(this).attr("what");
+    Main.showChart();
 });
-bootstrapNumber("#energePercentageNumber", {
-    upClass: "primary btn-lg", downClass: "primary btn-lg",
-    upText: "+", downText: "-", center: true
-});
-bootstrapNumber("#intervalNumber", {
-    upClass: "danger btn-lg", downClass: "danger btn-lg",
-    upText: "Slower", downText: "Faster", center: true
-});
-$(".numberWrapper").width($("#colorGroup").width());
 
-$("#refs").attr("href", "https://github.com/ChalkPE/Web/commit/" + $("#refs").text());
+$("#refs").attr("href", "https://github.com/seize-online/seize-online/commit/" + $("#refs").text());
 $("#refs").text($("#refs").text().substring(0, 7));
-
-$(window).on("beforeunload", function(){
-    return onMainMenu ? undefined : "You will lose all the game progess.";
-});
 
 //END OF FILE
