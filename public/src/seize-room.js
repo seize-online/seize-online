@@ -29,7 +29,7 @@ $(function(){
 
         var maxWidth = 0; $("#colorGroup > button").each(function(){
             maxWidth = max(maxWidth, $(this).width());
-        }); $("#colorGroup > button").width(maxWidth);
+        }); $("#colorGroup > button").width(maxWidth + 1);
     });
 
     var selectedStandard = null;
