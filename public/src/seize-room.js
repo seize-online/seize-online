@@ -58,5 +58,4 @@ $(function(){
         upClass: "danger btn-lg", downClass: "danger btn-lg",
         upText: "+", downText: "-", center: true
     });
-    $(".numberWrapper").width($("#colorGroup").width());
 });
