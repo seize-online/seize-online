@@ -13,7 +13,7 @@ html, body {
 }
 
 .title {
-    margin: 10px; color: #E0E4CC; text-shadow: 3px 3px 3px #111111; font-size: 32px;
+    margin-bottom: 15px; color: #E0E4CC; text-shadow: 3px 3px 3px #111111; font-size: 32px;
 }
 
 #sketch {
@@ -22,12 +22,12 @@ html, body {
 
 #container {
     padding: 15px; text-align: center !important;
-    background-color: rgba(32, 32, 32, 0.2); color: #333;
+    background-color: rgba(32, 32, 32, 0.2); color: #333333;
     position: absolute; top: 0px; bottom: 0px; left: 0px; right: 0px; margin: auto;
 }
 
 #pageContainer {
-    padding: 20px;
+    padding: 32px;
 }
 
 #copyright {
@@ -48,8 +48,8 @@ html, body {
     float: none; margin: 0 auto;
 }
 
-a:hover, a:focus {
-    color: inherit;
+a:focus, a:hover {
+    color: #CCCCCC;
     text-decoration: none;
 }
 
@@ -64,7 +64,7 @@ a:hover, a:focus {
 }
 
 .table-bordered-dark {
-    border: 1px solid #555;
+    border: 1px solid #555555;
 }
 
 .table-striped-dark {
@@ -75,17 +75,16 @@ a:hover, a:focus {
     background-color: rgba(32, 32, 32, 0.6);
 }
 .table-striped-dark > tbody > tr > td {
-    border-top: 1px solid #555;
+    border-top: 1px solid #555555;
 }
 .table-striped-dark > thead > tr > th {
-    color: #ddd; border-bottom: 2px solid #555;
+    color: #DDDDDD; border-bottom: 2px solid #555555;
 }
 
 /* =============================== index =============================== */
 
-#mainButtons > button {
+#mainButtons > button:not(:first-of-type) {
     margin-top: 16px;
-    margin-bottom: 16px;
 }
 
 /* =============================== room =============================== */
@@ -94,22 +93,19 @@ a:hover, a:focus {
     padding-top: 40px;
 }
 
-.numberWrapper:not(:last-of-type) {
-    margin-bottom: 20px;
-}
-
 /* =============================== play =============================== */
 
 #navigation {
-    padding: 5px; position: absolute; background-color: rgba(64, 64, 64, 0.6); border-radius: 8px;
+    padding: 5px; position: absolute; background-color: rgba(64, 64, 64, 0.6);
+    text-align: center; font-family: 'Inconsolata'; border-radius: 8px;
 }
 
 #navigation div {
-    font-size: 24px; text-shadow: 3px 3px 3px #111111; text-align: center; font-family: 'Inconsolata'; color: #EEEEEE;
+    font-size: 24px; text-shadow: 3px 3px 3px #111111; color: #EEEEEE;
 }
 
 #navigation tr {
-    font-size: 18px; text-shadow: 2px 2px 2px #151515; text-align: center; font-family: 'Inconsolata';
+    font-size: 18px; text-shadow: 2px 2px 2px #151515;
 }
 
 #toolbar {
