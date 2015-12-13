@@ -7,3 +7,6 @@
 [submodule "public/lib/bootstrap-number-input"]
 	path = public/lib/bootstrap-number-input
 	url = https://github.com/ChalkPE/bootstrap-number-input.git
+[submodule "public/lib/bootstrap-validator"]
+	path = public/lib/bootstrap-validator
+	url = https://github.com/1000hz/bootstrap-validator.git
