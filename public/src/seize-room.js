@@ -58,4 +58,6 @@ $(function(){
         upClass: "danger btn-lg", downClass: "danger btn-lg",
         upText: "+", downText: "-", center: true
     });
+
+    $("#roomNameInput").validator({ delay: 0 });
 });
