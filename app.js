@@ -8,7 +8,7 @@ var bodyParser = require('body-parser');
 var debug = require('debug')('seize-online:server');
 
 var app = express();
-app.set('port', process.env.PORT || '3000');
+app.set('port', process.env.PORT || '80');
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 

@@ -12,6 +12,11 @@ html, body {
     font-family: 'Quantico', 'Nanum Gothic', sans-serif; text-decoration: none;
 }
 
+a:focus, a:active, ::-moz-focus-inner {
+    border: none;
+    outline : none;
+}
+
 .title {
     margin-bottom: 15px; color: #E0E4CC; text-shadow: 3px 3px 3px #111111; font-size: 32px;
 }
