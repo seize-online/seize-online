@@ -45,17 +45,91 @@ app.use(function(err, req, res, next){
 var server = http.createServer(app);
 var io = require('socket.io')(server);
 
+var rooms = {};
+var pattern = /^[A-Za-z0-9-]{4,32}$/;
+
 io.on('connection', function(socket){
     socket.on('room create', function(data){
-        console.log(data.name);
+        if(!data.room || !pattern.test(data.room)) return socket.emit('room create', {
+            success: false,
+            reason: "invalid-name"
+        });
+
+        data.room = data.room.toLowerCase();
+        if(rooms[data.room]) return socket.emit('room create', {
+            success: false,
+            reason: "already-exists"
+        });
+
+        if(socket.rooms.length > 0) return socket.emit('room create', {
+            success: false,
+            reason: "already-joined"
+        });
+
+        socket.join(data.room);
+        rooms[data.room] = {
+            host: socket.id, clients: []
+        };
+
+        socket.emit('room create', {
+            success: true, room: data.room
+        });
+    });
+
+    socket.on('room join', function(data){
+        if(!data.room || !pattern.test(data.room)) return socket.emit('room join', {
+            success: false,
+            reason: "invalid-name"
+        });
+
+        data.room = data.room.toLowerCase();
+        if(!rooms[data.room]) return socket.emit('room join', {
+            success: false,
+            reason: "not-exists"
+        });
+
+        if(socket.rooms.length > 0) return socket.emit('room join', {
+            success: false,
+            reason: "already-joined"
+        });
+
+        socket.join(data.room);
+        rooms[data.room].clients.push(socket.id);
+
+        socket.emit('room join', {
+            success: true, room: data.room
+        });
+    });
+
+    socket.on('room leave', function(){
+        socket.rooms.forEach(function(room){
+            if(rooms[room] && rooms[room].host === socket.id){
+                if(rooms[room].clients.length === 0) delete rooms[room];
+                else{
+                    rooms[room].host = rooms[room].clients.splice(Math.floor(Math.random() * rooms[room].clients.length), 1)[0];
+                    io.to(rooms[room].host).emit("you are now host");
+                }
+            }
+            socket.leave(room);
+        });
+
+        socket.emit('room leave', {
+            success: true, rooms: socket.rooms
+        });
     });
 
     socket.on('update fields', function(data){
-        socket.broadcast.emit('update fields', data);
+        if(socket.rooms.length === 0) return;
+        if(rooms[socket.rooms[0]].host !== socket.id) return;
+
+        socket.broadcast.to(socket.rooms[0]).emit('update fields', data);
     });
 
     socket.on('update nations', function(data){
-        socket.broadcast.emit('update nations', data);
+        if(socket.rooms.length === 0) return;
+        if(rooms[socket.rooms[0]].host !== socket.id) return;
+
+        socket.broadcast.to(socket.rooms[0]).emit('update nations', data);
     });
 });
 
