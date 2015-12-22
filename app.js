@@ -140,7 +140,7 @@ server.listen(app.get('port'), function(){
 server.on('error', function(error){
     if(error.syscall !== 'listen') throw error;
 
-    var bind = (typeof port === 'string') ? ('Pipe ' + port) : ('Port ' + port);
+    var bind = (typeof app.get('port') === 'string') ? ('Pipe ' + app.get('port')) : ('Port ' + app.get('port'));
     switch(error.code){
         case 'EACCES':
             console.error(bind + ' requires elevated privileges');
