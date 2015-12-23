@@ -1,11 +1,46 @@
 extends page
 
-append scripts
+block scripts
     - var menu = 'room';
     script(src='/lib/bootstrap-number-input/bootstrap-number-input.js')
     script(src='/lib/bootstrap-validator/dist/validator.min.js')
+    script(src='/lib/sketch.js/js/sketch.js')
+    script(src='/lib/Chart.js/Chart.min.js')
+    script.
+        var room = "#{room}";
 
 block container
+    #toolbar
+        button#pauseButton.btn.btn-lg.btn-primary Pause
+        button#navigationToggleButton.btn.btn-lg.btn-warning Show navigation
+        button#powerTextToggleButton.btn.btn-lg.btn-warning Show power text
+        #chartDropdown.dropup(style='display: inline-block;')
+            button#chartDropdownButton.btn.btn-info.btn-lg.dropdown-toggle(type='button', data-toggle='dropdown', aria-haspopup='true', aria-expanded='false')
+                | Power 
+                span.caret
+            ul.dropdown-menu(aria-labelledby='chartDropdownMenu')
+                li
+                    a#chartWhatButton(href='#', what='power') Power
+                li
+                    a#chartWhatButton(href='#', what='average') Average
+                li
+                    a#chartWhatButton(href='#', what='energeFields') Energe
+                li
+                    a#chartWhatButton(href='#', what='fields') Fields
+        #rightButtons(style='float: right;')
+            button#quitButton.btn.btn-lg.btn-danger Quit to title
+            button#restartButton.btn.btn-lg.btn-danger Restart
+            button#timer.btn.btn-lg.disabled @ChalkPE
+    #navigation
+        table#status.table.table-striped-dark
+            thead
+                tr
+                    th COLOR
+                    th POWER
+                    th AVERAGE
+                    th ENERGE
+                    th FIELDS
+            tbody
     form(data-toggle='validator', role='form')
         #optionBox.form-group.has-feedback.col-md-4.col-xs-6.col-centered
             label.control-label.title(for='roomNameInput') Room name

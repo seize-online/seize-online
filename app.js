@@ -21,7 +21,6 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', require('./routes/index'));
 app.use('/room', require('./routes/room'));
-app.use('/play', require('./routes/play'));
 app.use('/help', require('./routes/help'));
 
 app.use(function(req, res, next){

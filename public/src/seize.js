@@ -92,37 +92,37 @@ var Main = {
         });
         $("#sketch").css("bottom", Main.onMainMenu ? "0px" : "")
 
-        Map.init();
+        if(Main.isHost){
+            var colors = shuffleArray(Nation.STANDARD);
+            colors.forEach(function(standard){
+                Map.setNation(standard.color, new Nation(standard.index, standard.color, standard.dark, standard.name));
+            });
+            Main.emitNations();
 
-        var colors = shuffleArray(Nation.STANDARD);
-        colors.forEach(function(standard){
-            Map.setNation(standard.color, new Nation(standard.index, standard.color, standard.dark, standard.name));
-        });
+            Map.init();
+            colors.splice(floor(colors.length / 2), 0, null);
+            colors.forEach(function(standard, index){
+                if(standard === null) return;
+                var nation = Map.getNation(standard.color);
+
+                var x = 1 + floor((Map.width - 3) / 2) * floor(index / 3);
+                var y = 1 + floor((Map.height - 3) / 2) * floor(index % 3);
+
+                var field = new EnergeField(x, y, 100, nation, 1);
+                Map.setField(x, y, field);
+
+                field.forEachSides(function(sideField, direction){
+                    if(sideField === null || !(sideField instanceof Field)) return;
+
+                    sideField = new Field(sideField.getX(), sideField.getY(), null, nation);
+                    Map.setField(sideField.getX(), sideField.getY(), sideField);
+                }, true);
+            });
+            Main.emitFields();
+        }
 
         if(Map.getPlayerNation() !== null) Map.getPlayerNation().name = "You";
         console.debug(Map.nations);
-
-        colors.splice(floor(colors.length / 2), 0, null);
-        colors.forEach(function(standard, index){
-            if(standard === null) return;
-            var nation = Map.getNation(standard.color);
-
-            var x = 1 + floor((Map.width - 3) / 2) * floor(index / 3);
-            var y = 1 + floor((Map.height - 3) / 2) * floor(index % 3);
-
-            var field = new EnergeField(x, y, 100, nation, 1);
-            Map.setField(x, y, field);
-
-            field.forEachSides(function(sideField, direction){
-                if(sideField === null || !(sideField instanceof Field)) return;
-
-                sideField = new Field(sideField.getX(), sideField.getY(), null, nation);
-                Map.setField(sideField.getX(), sideField.getY(), sideField);
-            }, true);
-        });
-
-        Main.emitFields();
-        Main.emitNations();
 
         Main.logger = new Logger();
         $("#sketch .sketch").show();
@@ -198,6 +198,11 @@ var Main = {
 
         Main.drawTitleMessage(win ? "YOU WIN!" : "GAME OVER");
         sketch.stop();
+
+        if(!win && socket){
+            socket.emit('game over');
+            Main.isHost = false;
+        }
 
         $("#pauseButton").prop("disabled", true);
         $("#pauseButton").text(Main.titleMessage);
@@ -304,7 +309,7 @@ var Main = {
         var clickedField = Map.getField(x, y);
         if(clickedField !== null && clickedField instanceof Field && clickedField.onClick()) return;
 
-        if(sketch.running && (Main.onMainMenu || Main.isHost)){
+        if(sketch.running && !Main.onMainMenu){
             Map.getPlayerNation().targetField = (clickedField === Map.getPlayerNation().getTargetField()) ? null : clickedField;
             Main.emitNations(Map.getPlayerNation());
 
@@ -1036,58 +1041,5 @@ EnergeField.prototype.onClick = function(){
         }
     }
 }
-
-/* ================================================================================================================================ */
-
-var isVirgin = true;
-
-var socket = io.connect();
-socket.on('update fields', function(data){
-    if(Main.isHost || Main.onMainMenu) return; data = JSON.parse(data);
-    if(isVirgin){
-        Map.forEachFields(function(f, x, y){
-            Map.setField(x, y, new Field(x, y));
-        });
-        isVirgin = false;
-    }
-
-    for(var key in data){
-        if(!data.hasOwnProperty(key)) continue;
-
-        var axis = key.split(":");
-        var x = parseInt(axis[0]);
-        var y = parseInt(axis[1]);
-
-        var fieldJSON = data[key];
-        var power = fieldJSON[0];
-        var nation = (fieldJSON[1] < 0) ? null : Map.getNation(Nation.STANDARD[fieldJSON[1]].color);
-
-        var field = Map.getField(x, y);
-        if(fieldJSON.length === 3 && (field === null || !(field instanceof EnergeField))){
-            Map.setField(x, y, new EnergeField(x, y, power, nation, fieldJSON[2]));
-        }else if(fieldJSON.length === 2 && (field === null || (field instanceof EnergeField))){
-            Map.setField(new Field(x, y, power, nation));
-        }else{
-            field.power = power;
-            field.nation = nation;
-        }
-    }
-});
-socket.on('update nations', function(data){
-    if(Main.isHost || Main.onMainMenu) return; data = JSON.parse(data);
-
-    for(var key in data){
-        if(!data.hasOwnProperty(key)) continue;
-
-        var nationJSON = data[key];
-        if(nationJSON === null) Map.setNation(key, null);
-        else{
-            var nation = Map.getNation(key);
-            if(nationJSON[0] === null) nation.targetField = null;
-            else nation.targetField = Map.getField(nationJSON[0][0], nationJSON[0][1]);
-        }
-
-    }
-});
 
 //END OF FILE
