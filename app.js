@@ -17,6 +17,9 @@ app.use(bodyParser.urlencoded({ extended: false }));
 var routes = require('./routes/index');
 app.use('/', routes);
 
+app.use('/js/jquery', express.static(path.join(__dirname, '/node_modules/jquery/dist/')));
+app.use('/js/sketch', express.static(path.join(__dirname, '/node_modules/sketch-js/js/')));
+
 app.use(function(req, res, next){
     var err = new Error('Not Found');
     err.status = 404;
