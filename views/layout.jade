@@ -9,5 +9,8 @@ html(lang='en')
         meta(name='mobile-web-app-capable', content='yes')
         meta(name='apple-mobile-web-app-capable', content='yes')
         link(rel='stylesheet', href='/css/style.css')
+        block stylesheets
     body
         block content
+        script(charset='utf-8', src='/js/jquery/jquery.min.js')
+        block scripts

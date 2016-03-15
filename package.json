@@ -11,8 +11,12 @@
     "debug": "~2.2.0",
     "express": "~4.13.1",
     "jade": "~1.11.0",
+    "jquery": "^2.2.1",
+    "materialize-css": "^0.97.5",
+    "mdi": "^1.5.54",
     "morgan": "~1.6.1",
     "serve-favicon": "~2.3.0",
+    "sketch-js": "^1.1.1",
     "socket.io": "^1.4.5"
   }
 }

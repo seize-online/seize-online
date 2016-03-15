@@ -31,5 +31,16 @@ app.use(function(err, req, res, next){
     });
 });
 
-var server = require('http').createServer(app);
+var http = require('http');
+var server = http.createServer(app);
+
+var io = require('socket.io')(server);
+io.on('connection', function(socket){
+
+});
+
 server.listen(app.get('port'));
+
+/*setInterval(function(){
+    io.emit('hello', { x: 0, y: 0 });
+}, 1);*/
