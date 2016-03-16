@@ -49,4 +49,4 @@ setInterval(function(){
 
     console.log(new Date() + ' ' + color);
     io.emit('hello', color);
-}, 2000);
+}, 200);
