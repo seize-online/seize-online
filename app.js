@@ -19,6 +19,7 @@ app.use('/', routes);
 
 app.use('/js/jquery', express.static(path.join(__dirname, '/node_modules/jquery/dist/')));
 app.use('/js/sketch', express.static(path.join(__dirname, '/node_modules/sketch-js/js/')));
+app.use('/materialize', express.static(path.join(__dirname, '/node_modules/materialize-css/dist/')));
 
 app.use(function(req, res, next){
     var err = new Error('Not Found');
