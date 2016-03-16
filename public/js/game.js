@@ -97,6 +97,11 @@ function Game(socket, sketch, world){
         });
     });
 
+    this.socket.on('hello', function(color){
+        self.sketch.fillStyle = color;
+        self.sketch.fillRect(0, 0, self.sketch.width, self.sketch.height);
+    });
+
     //TODO: Implement other callbacks
 }
 
@@ -105,13 +110,19 @@ Sketch.install(this);
 
 $(function(){
     var size = min($(window).innerWidth(), $(window).innerHeight());
+
     sketch = Sketch.create({
         fullscreen: false,
         width: size, height: size,
-        autostart: true, autopause: false,
+        autostart: false, autopause: false,
 
         setup: function(){
             //TODO: Implement this method
         }
     });
+
+    var socket = io();
+    var world = new World();
+
+    var game = new Game(socket, sketch, world);
 });

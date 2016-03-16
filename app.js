@@ -44,6 +44,9 @@ io.on('connection', function(socket){
 
 server.listen(app.get('port'));
 
-/*setInterval(function(){
-    io.emit('hello', { x: 0, y: 0 });
-}, 1);*/
+setInterval(function(){
+    var color = '#' + ('000000' + Math.floor(Math.random() * 0x1000000).toString(16)).slice(-6);
+
+    console.log(new Date() + ' ' + color);
+    io.emit('hello', color);
+}, 2000);
