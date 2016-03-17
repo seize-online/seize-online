@@ -64,6 +64,14 @@ function World(width, height){
 }
 
 World.prototype = {
+    getWidth: function(){
+        return this.width;
+    },
+
+    getHeight: function(){
+        return this.height;
+    },
+
     getField: function(x, y){
         if(x instanceof Field){
             y = field.getY();
@@ -82,6 +90,19 @@ World.prototype = {
 
         this.fields[x + ':' + y] = field;
         return field;
+    },
+
+    forEach: function(callback, options){
+        options = options || {};
+            entire: false,
+            range: [[0, 0], [this.getWorld().getWidth(), this.getWorld().getHeight()]
+        };
+
+        for(var x = options.range[0][0]; x < options.range[1][0]; x++) for(var y = options.range[0][1]; y < options.range[1][1]; y++){
+            var field = this.getField(x, y);
+            if(!field && !options.entire) continue;
+            if(callback(field)) return;
+        }
     }
 };
 
