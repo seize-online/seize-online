@@ -22,7 +22,6 @@ var mongoose = require('mongoose');
 var MongoStore = require('connect-mongo')(session);
 
 var path = require('path');
-var logger = require('morgan');
 var favicon = require('serve-favicon');
 var bodyParser = require('body-parser');
 var cookieParser = require('cookie-parser');
@@ -30,13 +29,25 @@ var cookieParser = require('cookie-parser');
 var passport = require('passport');
 var passportSocketIo = require('passport.socketio');
 
+var chalk = require('chalk');
+var morgan = require('morgan');
+var moment = require('moment');
+
+morgan.token('the-date', () => moment().format('YYYY-MM-DD[T]HH:mm:ss.SSSZZ'));
+morgan.token('the-status', (req, res) => {
+    var status = res._header ? res.statusCode : undefined;
+    var color = status >= 500 ? 'red' : status >= 400 ? 'yellow' : status >= 300 ? 'cyan' : status >= 200 ? 'green' : 'reset';
+
+    return chalk[color](status);
+});
+
 var app = express();
 app.set('view engine', 'jade');
 app.set('views', path.join(__dirname, 'views'));
 app.set('port', process.env.PORT || '3000');
 
 app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
-app.use(logger(':date[iso] :remote-addr :remote-user :method :status :url - :response-time ms'));
+app.use(morgan(':the-date :method HTTP/:http-version :the-status :remote-addr :remote-user :url - :response-time ms'));
 
 app.use(cookieParser());
 app.use(bodyParser.json());
