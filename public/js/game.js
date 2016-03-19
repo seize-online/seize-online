@@ -15,12 +15,29 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-html, body {
-    background-color: #222222;
-    overflow: hidden; z-index: -2; margin: 0;
-}
+var sketch = null;
+Sketch.install(this);
 
-#sketch {
-    z-index: -1; position: absolute;
-    top: 0px; left: 0px; right: 0px;
-}
+$(function(){
+    var size = min($(window).innerWidth(), $(window).innerHeight());
+
+    sketch = Sketch.create({
+        fullscreen: false,
+        width: size, height: size,
+        autostart: false, autopause: false
+    });
+
+    var socket = io();
+    var world = new World();
+
+    socket.on('update field', function(data){
+        data.split(';').forEach(function(str){
+            world.setField(Field.fromString(str));
+        });
+    });
+
+    socket.on('hello', function(color){
+        sketch.fillStyle = color;
+        sketch.fillRect(0, 0, sketch.width, sketch.height);
+    });
+});

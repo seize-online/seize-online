@@ -1,156 +1,88 @@
+/*
+ * Copyright (C) 2015-2016  ChalkPE
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published
+ * by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 var http = require('http');
 var express = require('express');
+var session = require('express-session');
+var mongoose = require('mongoose');
+var MongoStore = require('connect-mongo')(session);
+
 var path = require('path');
-var favicon = require('serve-favicon');
 var logger = require('morgan');
-var cookieParser = require('cookie-parser');
+var favicon = require('serve-favicon');
 var bodyParser = require('body-parser');
-var debug = require('debug')('seize-online:server');
+var cookieParser = require('cookie-parser');
+
+var passport = require('passport');
+var passportSocketIo = require('passport.socketio');
 
 var app = express();
-app.set('port', process.env.PORT || '80');
-app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
+app.set('views', path.join(__dirname, 'views'));
+app.set('port', process.env.PORT || '3000');
 
 app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(logger(':date[iso] :remote-addr :remote-user :method :status :url - :response-time ms'));
+
+app.use(cookieParser());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
-app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/', require('./routes/index'));
-app.use('/room', require('./routes/room'));
-app.use('/help', require('./routes/help'));
+mongoose.connect('mongodb://localhost/seize', { server: { auto_reconnect: true } });
+var db = mongoose.connection;
 
-app.use(function(req, res, next){
-    var err = new Error('Not Found');
-    err.status = 404;
-    next(err);
-});
+db.on('error', console.error.bind(console, "connection error:"));
+db.once('open', () => console.log("Connected database", db.name));
 
-if(app.get('env') === 'development'){
-    app.use(function(err, req, res, next){
-        res.status(err.status || 500);
-        res.render('error', { message: err.message, error: err });
-    });
-}
+var exit = () => mongoose.connection.close(() => process.exit(0));
+process.on('SIGINT', exit).on('SIGTERM', exit);
 
-app.use(function(err, req, res, next){
-    res.status(err.status || 500);
-    res.render('error', { message: err.message, error: {} });
-});
+var mongoStore = new MongoStore({ mongooseConnection: db });
+app.use(session({ secret: 'seize', key: 'seize.sid', store: mongoStore, resave: true, saveUninitialized: true }));
+
+app.use(passport.initialize());
+app.use(passport.session());
 
 var server = http.createServer(app);
 var io = require('socket.io')(server);
 
-var rooms = {};
-var pattern = /^[A-Za-z0-9-]{4,32}$/;
+io.use(passportSocketIo.authorize({ cookieParser: cookieParser, secret: 'seize', key: 'seize.sid', store: mongoStore }));
 
-io.on('connection', function(socket){
-    socket.on('room create', function(data){
-        if(!data.room || !pattern.test(data.room)) return socket.emit('room create', {
-            success: false,
-            reason: "invalid-name"
-        });
+require('./app/socket')(io);
+require('./app/routes')(app);
 
-        data.room = data.room.toLowerCase();
-        if(rooms[data.room]) return socket.emit('room create', {
-            success: false,
-            reason: "already-exists"
-        });
-
-        if(socket.rooms.length > 0) return socket.emit('room create', {
-            success: false,
-            reason: "already-joined"
-        });
-
-        socket.join(data.room);
-        rooms[data.room] = {
-            host: socket.id, clients: []
-        };
-
-        socket.emit('room create', {
-            success: true, room: data.room
-        });
-    });
-
-    socket.on('room join', function(data){
-        if(!data.room || !pattern.test(data.room)) return socket.emit('room join', {
-            success: false,
-            reason: "invalid-name"
-        });
-
-        data.room = data.room.toLowerCase();
-        if(!rooms[data.room]) return socket.emit('room join', {
-            success: false,
-            reason: "not-exists"
-        });
-
-        if(socket.rooms.length > 0) return socket.emit('room join', {
-            success: false,
-            reason: "already-joined"
-        });
-
-        socket.join(data.room);
-        rooms[data.room].clients.push(socket.id);
-
-        socket.emit('room join', {
-            success: true, room: data.room
-        });
-    });
-
-    socket.on('room leave', function(){
-        socket.rooms.forEach(function(room){
-            if(rooms[room] && rooms[room].host === socket.id){
-                if(rooms[room].clients.length === 0) delete rooms[room];
-                else{
-                    rooms[room].host = rooms[room].clients.splice(Math.floor(Math.random() * rooms[room].clients.length), 1)[0];
-                    io.to(rooms[room].host).emit("you are now host");
-                }
-            }
-            socket.leave(room);
-        });
-
-        socket.emit('room leave', {
-            success: true, rooms: socket.rooms
-        });
-    });
-
-    socket.on('update fields', function(data){
-        if(socket.rooms.length === 0) return;
-        if(rooms[socket.rooms[0]].host !== socket.id) return;
-
-        socket.broadcast.to(socket.rooms[0]).emit('update fields', data);
-    });
-
-    socket.on('update nations', function(data){
-        if(socket.rooms.length === 0) return;
-        if(rooms[socket.rooms[0]].host !== socket.id) return;
-
-        socket.broadcast.to(socket.rooms[0]).emit('update nations', data);
-    });
-});
-
-server.listen(app.get('port'), function(){
+server.listen(app.get('port'), () => {
     console.log('Listening on port ' + app.get('port'));
+    setInterval(() => io.emit('hello', '#' + ('000000' + Math.floor(Math.random() * 0x1000000).toString(16)).slice(-6)), 1000);
 });
 
-server.on('error', function(error){
+server.on('error', error => {
     if(error.syscall !== 'listen') throw error;
+    var bind = ((typeof app.get('port') === 'string') ? 'Pipe ' : 'Port ') + app.get('port');
 
-    var bind = (typeof app.get('port') === 'string') ? ('Pipe ' + app.get('port')) : ('Port ' + app.get('port'));
     switch(error.code){
         case 'EACCES':
-            console.error(bind + ' requires elevated privileges');
-            process.exit(1);
-            break;
+            console.error(bind, 'requires elevated privileges');
+            process.exit(1); break;
 
         case 'EADDRINUSE':
-            console.error(bind + ' is already in use');
-            process.exit(1);
-            break;
-        default:
-            throw error;
+            console.error(bind,'is already in use');
+            process.exit(1); break;
+
+        default: throw error;
     }
 });

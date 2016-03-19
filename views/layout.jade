@@ -1,33 +1,21 @@
 doctype html
 html(lang='en')
-  head
-    meta(charset='utf-8')
-    title= title
-    meta(http-equiv='X-UA-Compatible', content='IE=edge, chrome=1')
-    meta(name='viewport', content='maximum-scale=1.0, user-scalable=no')
-    meta(name='theme-color', content='#222222')
-    meta(name='mobile-web-app-capable', content='yes')
-    meta(name='apple-mobile-web-app-capable', content='yes')
-    meta(property='og:type', content='website')
-    meta(property='og:title', content='seize.online')
-    meta(property='og:description', content='Developed by @ChalkPE')
-    link(rel='stylesheet', href='//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css')
-    link(rel='stylesheet', href='/css/style.css')
-  body
-    #sketch
-    block content
-    a#copyright(href='//chalk.pe') Developed by @ChalkPE
-    script(src='//code.jquery.com/jquery-2.1.4.min.js')
-    script(src='//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js')
-    script(src='/socket.io/socket.io.js')
-    script(src='/lib/sketch.js/js/sketch.js')
-    block scripts
-    script(src='/src/seize.js', charset='utf-8')
-    if menu
-        script(src='/src/seize-#{menu}.js', charset='utf-8')
-    if onMainMenu
-        script.
-            $(function(){
-                Main.onMainMenu = true;
-                Main.startGame();
-            });
+    head
+        title seize-online
+        meta(charset='utf-8')
+        meta(http-equiv='X-UA-Compatible', content='IE=edge, chrome=1')
+        meta(name='viewport', content='maximum-scale=1.0, user-scalable=no')
+        meta(name='theme-color', content='#222222')
+        meta(name='mobile-web-app-capable', content='yes')
+        meta(name='apple-mobile-web-app-capable', content='yes')
+        meta(property='og:type', content='website')
+        meta(property='og:title', content='seize.online')
+        meta(property='og:description', content='The simple time-wasting game')
+        link(charset='utf-8', rel='stylesheet', href='/materialize/css/materialize.min.css')
+        link(charset='utf-8', rel='stylesheet', href='/css/style.css')
+        block stylesheets
+    body
+        block content
+        script(charset='utf-8', src='/js/jquery/jquery.min.js')
+        script(charset='utf-8', src='/materialize/js/materialize.min.js')
+        block scripts

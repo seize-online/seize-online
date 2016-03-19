@@ -15,12 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-html, body {
-    background-color: #222222;
-    overflow: hidden; z-index: -2; margin: 0;
-}
-
-#sketch {
-    z-index: -1; position: absolute;
-    top: 0px; left: 0px; right: 0px;
-}
+module.exports = function(io){
+    io.on('connection', function(socket){
+        //TODO: Implement this method
+    });
+};

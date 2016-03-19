@@ -1,11 +1,5 @@
-extends page
+extends layout
 
-append scripts
-    - var menu = 'index';
-
-block container
-    .col-centered.col-xs-5.col-md-3#mainButtons
-        button.btn.btn-primary.btn-lg.btn-block#singleplayButton Singleplayer
-        button.btn.btn-warning.btn-lg.btn-block#multiplayButton Multiplayer
-        button.btn.btn-danger.btn-lg.btn-block#settingsButton Help
-    a#refs= hash
+block content
+    .container
+        p.chip Hello, world!
