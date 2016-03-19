@@ -1,12 +1,22 @@
 {
   "name": "seize-online",
   "version": "1.0.0",
+  "description": "The simple time-wasting game",
+  "homepage": "https://github.com/seize-online/seize-online",
+  "bugs": {
+    "url": "https://github.com/seize-online/seize-online/issues"
+  },
+  "license": "AGPL-3.0",
+  "author": "ChalkPE <chalkpe@gmail.com> (http://chalk.pe)",
+  "main": "app.js",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/seize-online/seize-online.git"
+  },
   "scripts": {
     "start": "node app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "ChalkPE",
-  "license": "AGPL-3.0",
   "dependencies": {
     "body-parser": "^1.15.0",
     "chalk": "^1.1.1",

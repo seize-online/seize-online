@@ -20,17 +20,18 @@ var passportConfig = require('../config/passport');
 
 module.exports = function(passport){
     passport.serializeUser((user, done) => done(null, user.id));
-    passport.deserializeUser((id, done) => User.findOne({ id: id }, (err, user) => done(err, user)));
+    passport.deserializeUser((id, done) => User.findOne({ id: id }, done));
 
     passport.use(new TwitterStrategy(passportConfig, (token, tokenSecret, profile, done) => process.nextTick(() => User.findOne({ 'id': profile.id }, (err, user) => {
         if(err) return done(err);
         if(user) return done(null, user);
-        else {
-            var newUser = new User({
-                id: profile.id, token: token,
-                username: profile.username, displayName: profile.displayName
-            });
-            newUser.save(err => done(err, newUser));
-        }
+
+        user = new User({
+            id: profile.id,
+            token: token,
+            username: profile.username,
+            displayName: profile.displayName
+        });
+        user.save(err => done(err, user));
     }))));
 };
