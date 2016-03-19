@@ -158,9 +158,9 @@ World.prototype = {
     },
 
     forEach: function(callback, options){
-        options = options || {};
+        options = options || {
             entire: false,
-            range: [[0, 0], [this.getWorld().getWidth(), this.getWorld().getHeight()]
+            range: [[0, 0], [this.getWorld().getWidth(), this.getWorld().getHeight()]]
         };
 
         for(var x = options.range[0][0]; x < options.range[1][0]; x++) for(var y = options.range[0][1]; y < options.range[1][1]; y++){
@@ -171,7 +171,7 @@ World.prototype = {
     }
 };
 
-if(module) module.exports = {
+if(typeof module !== 'undefined') module.exports = {
     'Direction': Direction,
     'FieldType': FieldType,
     'Field': Field,

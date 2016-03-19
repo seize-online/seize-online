@@ -1,53 +1,70 @@
-var path = require('path');
+/*
+ * Copyright (C) 2015-2016  ChalkPE
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published
+ * by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+var http = require('http');
 var express = require('express');
+var session = require('express-session');
+var mongoose = require('mongoose');
+var MongoStore = require('connect-mongo')(session);
+
+var path = require('path');
+var logger = require('morgan');
+var favicon = require('serve-favicon');
+var bodyParser = require('body-parser');
+var cookieParser = require('cookie-parser');
+
+var passport = require('passport');
+var passportSocketIo = require('passport.socketio');
 
 var app = express();
 app.set('view engine', 'jade');
 app.set('views', path.join(__dirname, 'views'));
 app.set('port', process.env.PORT || '3000');
 
-app.use(require('morgan')('dev'));
-app.use(require('cookie-parser')());
-app.use(express.static(path.join(__dirname, 'public')));
-
-var bodyParser = require('body-parser');
+app.use(logger('dev'));
+app.use(cookieParser());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
+app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 
-var routes = require('./routes/index');
-app.use('/', routes);
+mongoose.connect('mongodb://localhost/seize', { server: { auto_reconnect: true } });
 
-app.use('/js/jquery', express.static(path.join(__dirname, '/node_modules/jquery/dist/')));
-app.use('/js/sketch', express.static(path.join(__dirname, '/node_modules/sketch-js/js/')));
-app.use('/materialize', express.static(path.join(__dirname, '/node_modules/materialize-css/dist/')));
+var db = mongoose.connection;
+db.on('error', console.error.bind(console, "connection error:"));
+db.once('open', () => console.log("Connected database", db.name));
 
-app.use(function(req, res, next){
-    var err = new Error('Not Found');
-    err.status = 404;
-    next(err);
-});
+var exit = () => mongoose.connection.close(() => process.exit(0));
+process.on('SIGINT', exit).on('SIGTERM', exit);
 
-app.use(function(err, req, res, next){
-    res.status(err.status || 500);
-    res.render('error', {
-        message: err.message,
-        error: err
-    });
-});
+var mongoStore = new MongoStore({ mongooseConnection: db });
+app.use(session({ secret: 'seize', key: 'seize.sid', store: mongoStore, resave: true, saveUninitialized: true }));
 
-var http = require('http');
+app.use(passport.initialize());
+app.use(passport.session());
+
 var server = http.createServer(app);
-
 var io = require('socket.io')(server);
-io.on('connection', function(socket){
 
+io.use(passportSocketIo.authorize({ cookieParser: cookieParser, secret: 'seize', key: 'seize.sid', store: mongoStore }));
+
+require('./app/socket')(io);
+require('./app/routes')(app);
+
+server.listen(app.get('port'), () => {
+    console.log('Listening on port ' + app.get('port'));
+    setInterval(() => io.emit('hello', '#' + ('000000' + Math.floor(Math.random() * 0x1000000).toString(16)).slice(-6)), 1000);
 });
-
-server.listen(app.get('port'));
-
-setInterval(function(){
-    var color = '#' + ('000000' + Math.floor(Math.random() * 0x1000000).toString(16)).slice(-6);
-
-    console.log(new Date() + ' ' + color);
-    io.emit('hello', color);
-}, 200);
