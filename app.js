@@ -22,6 +22,7 @@ var mongoose = require('mongoose');
 var MongoStore = require('connect-mongo')(session);
 
 var path = require('path');
+var minify = require('express-minify');
 var favicon = require('serve-favicon');
 var bodyParser = require('body-parser');
 var cookieParser = require('cookie-parser');
@@ -46,6 +47,7 @@ app.set('view engine', 'jade');
 app.set('views', path.join(__dirname, 'views'));
 app.set('port', process.env.PORT || '3000');
 
+app.use(minify());
 app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(morgan(':the-date :method HTTP/:http-version :the-status :remote-addr :remote-user :url - :response-time ms'));
 
