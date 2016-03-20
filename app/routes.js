@@ -20,8 +20,8 @@ var express = require('express');
 
 module.exports = (app, passport) => {
     app.use('/',            express.static(path.join(__dirname, '..', 'public')));
-    app.use('/js/jquery',   express.static(path.join(__dirname, '..', 'node_modules', 'jquery', 'dist')));
-    app.use('/js/sketch',   express.static(path.join(__dirname, '..', 'node_modules', 'sketch-js', 'js')));
+    app.use('/jquery',      express.static(path.join(__dirname, '..', 'node_modules', 'jquery', 'dist')));
+    app.use('/sketch',      express.static(path.join(__dirname, '..', 'node_modules', 'sketch-js', 'js')));
     app.use('/materialize', express.static(path.join(__dirname, '..', 'node_modules', 'materialize-css', 'dist')));
 
     app.get('/', function(req, res, next){

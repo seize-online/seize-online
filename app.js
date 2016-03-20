@@ -65,13 +65,13 @@ process.on('SIGINT', exit).on('SIGTERM', exit);
 var mongoStore = new MongoStore({ mongooseConnection: db });
 app.use(session({ secret: 'seize', key: 'seize.sid', store: mongoStore, resave: true, saveUninitialized: true }));
 
-app.use(passport.initialize());
-app.use(passport.session());
+// app.use(passport.initialize());
+// app.use(passport.session());
 
 var server = http.createServer(app);
 var io = require('socket.io')(server);
 
-io.use(passportSocketIo.authorize({ cookieParser: cookieParser, secret: 'seize', key: 'seize.sid', store: mongoStore }));
+// io.use(passportSocketIo.authorize({ cookieParser: cookieParser, secret: 'seize', key: 'seize.sid', store: mongoStore }));
 
 require('./app/socket')(io);
 require('./app/routes')(app);
