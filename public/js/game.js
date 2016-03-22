@@ -15,20 +15,29 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+"use strict";
+
 var sketch = null;
 Sketch.install(this);
 
+var socket = null;
+var world = null;
+
 $(function(){
     var size = min($(window).innerWidth(), $(window).innerHeight());
+    var fieldSize = 0;
 
     sketch = Sketch.create({
-        fullscreen: false,
-        width: size, height: size,
-        autostart: false, autopause: false
+        fullscreen: false, width: size, height: size,
+        autostart: false, autopause: false, autoclear: true
     });
 
-    var socket = io();
-    var world = new World();
+    socket = io();
+    world = new World();
+
+    socket.on('update meta', function(data){
+        if(data.fieldSize) fieldSize = data.fieldSize;
+    });
 
     socket.on('update field', function(data){
         data.split(';').forEach(function(str){
@@ -40,4 +49,14 @@ $(function(){
         sketch.fillStyle = color;
         sketch.fillRect(0, 0, sketch.width, sketch.height);
     });
+
+    sketch.drawField = function(field){
+        sketch.fillStyle = 
+    };
+
+    sketch.draw = function(){
+        world.forEach(function(field, x, y){
+
+        });
+    };
 });

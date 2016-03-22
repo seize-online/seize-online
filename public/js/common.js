@@ -47,6 +47,19 @@ Direction.EIGHT = [Direction.NORTH, Direction.NORTHEAST, Direction.EAST, Directi
 
 Object.freeze(Direction);
 
+var Colors = [
+    {color: "#E91E63", dark: "#C2185B", name: "Pink",   text: "#fff"},
+    {color: "#9C27B0", dark: "#7B1FA2", name: "Purple", text: "#fff"},
+    {color: "#3F51B5", dark: "#303F9F", name: "Indigo", text: "#fff"},
+    {color: "#009688", dark: "#00796B", name: "Teal",   text: "#000"},
+    {color: "#8BC34A", dark: "#689F38", name: "Green",  text: "#000"}, //Light Green
+    {color: "#FFC107", dark: "#FFA000", name: "Amber",  text: "#000"},
+    {color: "#795548", dark: "#5D4037", name: "Brown",  text: "#fff"},
+    {color: "#607D8B", dark: "#455A64", name: "Grey",   text: "#fff"} //Blue Grey
+];
+
+Object.freeze(Colors);
+
 var FieldType = {
     ENERGE:    1,
     TERRITORY: 1 << 1,
@@ -94,6 +107,10 @@ Field.prototype = {
 
     isBarrier: function(){
         return this.getType() & FieldType.BARRIER;
+    },
+
+    getNationId: function(){
+        return (this.getType() >> 4) & 7;
     },
 
     getSideField: function(world, direction){
@@ -158,21 +175,21 @@ World.prototype = {
     },
 
     forEach: function(callback, options){
-        options = options || {
-            entire: false,
-            range: [[0, 0], [this.getWorld().getWidth(), this.getWorld().getHeight()]]
-        };
+        options = options || {};
+        if(!('entire' in options)) options.entire = false;
+        if(!('range'  in options)) options.range  = [[0, 0], [this.getWorld().getWidth(), this.getWorld().getHeight()]];
 
         for(var x = options.range[0][0]; x < options.range[1][0]; x++) for(var y = options.range[0][1]; y < options.range[1][1]; y++){
             var field = this.getField(x, y);
             if(!field && !options.entire) continue;
-            if(callback(field)) return;
+            if(callback(field, x, y)) return;
         }
     }
 };
 
 if(typeof module !== 'undefined') module.exports = {
     'Direction': Direction,
+    'Colors': Colors,
     'FieldType': FieldType,
     'Field': Field,
     'World': World
