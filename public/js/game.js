@@ -24,22 +24,34 @@ var socket = null;
 var world = null;
 
 $(function(){
-    var size = min($(window).innerWidth(), $(window).innerHeight());
-    var fieldSize = 0;
+    var options = {
+        fieldCount: 0, fieldSize: 0,
+        size: min($(window).innerWidth(), $(window).innerHeight())
+    };
 
     sketch = Sketch.create({
-        fullscreen: false, width: size, height: size,
-        autostart: false, autopause: false, autoclear: true
+        fullscreen: false, width: options.size, height: options.size,
+        autostart: false, autopause: false, autoclear: false
     });
 
     socket = io();
     world = new World();
 
     socket.on('update meta', function(data){
-        if(data.fieldSize) fieldSize = data.fieldSize;
+        console.log('update meta', data);
+
+        if(data.fieldCount){
+            options.fieldCount = data.fieldCount;
+            options.fieldSize = floor(options.size / options.fieldCount);
+            world.width = world.height = options.fieldCount;
+
+            sketch.start();
+        }
     });
 
     socket.on('update field', function(data){
+        console.log('update field', data);
+
         data.split(';').forEach(function(str){
             world.setField(Field.fromString(str));
         });
@@ -51,12 +63,14 @@ $(function(){
     });
 
     sketch.drawField = function(field){
-        sketch.fillStyle = 
+        var x = field.getX() * options.fieldSize;
+        var y = field.getY() * options.fieldSize;
+
+        sketch.fillStyle = Colors[field.getNationId()].color;
+        sketch.fillRect(x, y, options.fieldSize, options.fieldSize);
     };
 
     sketch.draw = function(){
-        world.forEach(function(field, x, y){
-
-        });
+        world.forEach(sketch.drawField);
     };
 });

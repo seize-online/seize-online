@@ -80,7 +80,7 @@ require('./app/routes')(app);
 
 server.listen(app.get('port'), () => {
     console.log('Listening on port ' + app.get('port'));
-    setInterval(() => io.emit('hello', '#' + ('000000' + Math.floor(Math.random() * 0x1000000).toString(16)).slice(-6)), 1000);
+    //setInterval(() => io.emit('hello', '#' + ('000000' + Math.floor(Math.random() * 0x1000000).toString(16)).slice(-6)), 1000);
 });
 
 server.on('error', error => {
