@@ -26,17 +26,25 @@ var world = null;
 $(function(){
     var options = {
         fieldCount: 0, fieldSize: 0,
-        size: min($(window).innerWidth(), $(window).innerHeight())
+        size: min($(window).innerWidth(), $(window).innerHeight()),
+        retina: (window.devicePixelRatio || 0) >= 2
     };
 
     sketch = Sketch.create({
         container: document.getElementById('sketch'),
         fullscreen: false, width: options.size, height: options.size,
-        autostart: false, autopause: false, autoclear: false
+        autostart: false, autopause: false, autoclear: true, retina: options.retina
     });
 
     socket = io();
     world = new World();
+
+    socket.on('update world', function(data){
+        console.log('update world', data);
+
+        world = World.fromString(data);
+        console.log(world);
+    });
 
     socket.on('update meta', function(data){
         console.log('update meta', data);
@@ -63,7 +71,7 @@ $(function(){
         sketch.fillRect(0, 0, sketch.width, sketch.height);
     });
 
-    function drawField(field, world, sketch){
+    function drawField(field){
         var x = field.getX() * options.fieldSize;
         var y = field.getY() * options.fieldSize;
 
@@ -75,15 +83,16 @@ $(function(){
 
         var size = options.fieldSize - sketch.lineWidth;
         var offset = sketch.lineWidth / 2;
-        
         sketch.strokeRect(x + offset, y + offset, size, size);
 
-        //Direction.FOUR.map(d => [d, field.getSideField(d, world)]).forEach(d => {
-            //TODO: Don't create border if the color is same
-        //});
-    };
+        sketch.textAlign = 'center';
+        sketch.textBaseline = 'middle';
+        sketch.font = ceil(options.fieldSize / 4) + "px 'Ubuntu Mono'";
+        sketch.fillStyle = Colors[field.getNationId()].text;
+        sketch.fillText(field.getMeta().toString(10), x + options.fieldSize / 2, y + options.fieldSize / 2);
+    }
 
     sketch.draw = function(){
-        world.forEach(sketch.drawField);
+        world.forEach(drawField);
     };
 });

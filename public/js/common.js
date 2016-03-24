@@ -130,20 +130,29 @@ Field.prototype = {
     },
 
     toString: function(){
-        return [this.getX(), this.getY(), this.getType(), this.getMeta()].map(function(value){ return value.toString(36); }).join(',');
+        return [this.getX(), this.getY(), this.getType(), this.getMeta()].map(value => value.toString(36)).join(',');
     }
 };
 
 Field.fromString = function(string){
-    var data = string.split(',').map(function(str){ return parseInt(str, 36); });
+    var data = string.split(',').map(str => parseInt(str, 36));
     return new Field(data[0], data[1], data[2], data[3]);
 };
 
-function World(width, height){
+function World(width, height, fields){
     this.width = width;
     this.height = height;
-    this.fields = {};
+    this.fields = fields || {};
 }
+
+World.fromString = function(string){
+    var data = string.split(';');
+
+    var world = new World(parseInt(data.shift(), 36), parseInt(data.shift(), 36));
+    data.forEach(str => world.setField(Field.fromString(str)));
+
+    return world;
+};
 
 World.prototype = {
     getWidth: function(){
@@ -182,8 +191,13 @@ World.prototype = {
         for(var x = options.range[0][0]; x < options.range[1][0]; x++) for(var y = options.range[0][1]; y < options.range[1][1]; y++){
             var field = this.getField(x, y);
             if(!field && !options.entire) continue;
-            if(callback(field, x, y)) return;
+            if(callback(field, x, y) === true) return;
         }
+    },
+
+    toString: function(){
+        var fields = []; this.forEach(field => fields.push(field.toString()));
+        return [this.getWidth(), this.getHeight()].map(v => v.toString(36)).concat(fields).join(';');
     }
 };
 
