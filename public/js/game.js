@@ -30,6 +30,7 @@ $(function(){
     };
 
     sketch = Sketch.create({
+        container: document.getElementById('sketch'),
         fullscreen: false, width: options.size, height: options.size,
         autostart: false, autopause: false, autoclear: false
     });
@@ -68,6 +69,10 @@ $(function(){
 
         sketch.fillStyle = Colors[field.getNationId()].color;
         sketch.fillRect(x, y, options.fieldSize, options.fieldSize);
+
+        sketch.lineWidth = ceil(options.fieldSize / 20);
+        sketch.strokeStyle = Colors[field.getNationId()].dark;
+        sketch.strokeRect(x, y, options.fieldSize, options.fieldSize);
     };
 
     sketch.draw = function(){
