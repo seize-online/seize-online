@@ -63,7 +63,7 @@ $(function(){
         sketch.fillRect(0, 0, sketch.width, sketch.height);
     });
 
-    sketch.drawField = function(field){
+    function drawField(field, world, sketch){
         var x = field.getX() * options.fieldSize;
         var y = field.getY() * options.fieldSize;
 
@@ -72,7 +72,15 @@ $(function(){
 
         sketch.lineWidth = ceil(options.fieldSize / 20);
         sketch.strokeStyle = Colors[field.getNationId()].dark;
-        sketch.strokeRect(x, y, options.fieldSize, options.fieldSize);
+
+        var size = options.fieldSize - sketch.lineWidth;
+        var offset = sketch.lineWidth / 2;
+        
+        sketch.strokeRect(x + offset, y + offset, size, size);
+
+        //Direction.FOUR.map(d => [d, field.getSideField(d, world)]).forEach(d => {
+            //TODO: Don't create border if the color is same
+        //});
     };
 
     sketch.draw = function(){

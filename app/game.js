@@ -37,7 +37,7 @@ Game.prototype.tick = function(buffer){
         }
 
         var d = Math.floor(Math.random() * Direction.FOUR.length);
-        var sideField = field.getSideField(self.getWorld(), Direction.FOUR[d]);
+        var sideField = field.getSideField(Direction.FOUR[d], self.getWorld());
 
         //TODO: Implement this method
     });

@@ -113,7 +113,7 @@ Field.prototype = {
         return (this.getType() >> 4) & 7;
     },
 
-    getSideField: function(world, direction){
+    getSideField: function(direction, world){
         var xx = 0;
         var yy = 0;
 
@@ -160,7 +160,7 @@ World.prototype = {
             x = field.getX();
         }
 
-        return this.fields[x + ':' + y];
+        return this.fields[x + ':' + y] || null;
     },
 
     setField: function(x, y, field){
