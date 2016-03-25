@@ -78,18 +78,66 @@ $(function(){
         sketch.fillStyle = Colors[field.getNationId()].color;
         sketch.fillRect(x, y, options.fieldSize, options.fieldSize);
 
-        sketch.lineWidth = ceil(options.fieldSize / 20);
-        sketch.strokeStyle = Colors[field.getNationId()].dark;
-
-        var size = options.fieldSize - sketch.lineWidth;
-        var offset = sketch.lineWidth / 2;
-        sketch.strokeRect(x + offset, y + offset, size, size);
+        drawFieldBorders(field);
 
         sketch.textAlign = 'center';
         sketch.textBaseline = 'middle';
         sketch.font = ceil(options.fieldSize / 4) + "px 'Ubuntu Mono'";
         sketch.fillStyle = Colors[field.getNationId()].text;
         sketch.fillText(field.getMeta().toString(10), x + options.fieldSize / 2, y + options.fieldSize / 2);
+    }
+
+    var borders = {};
+    borders[Direction.NORTH] = [Direction.NORTHWEST, Direction.NORTHEAST,  0,  1];
+    borders[Direction.EAST]  = [Direction.NORTHEAST, Direction.SOUTHEAST, -1,  0];
+    borders[Direction.SOUTH] = [Direction.SOUTHEAST, Direction.SOUTHWEST,  0, -1];
+    borders[Direction.WEST]  = [Direction.SOUTHWEST, Direction.NORTHWEST,  1,  0];
+
+    function drawFieldBorders(field){
+        Direction.FOUR.forEach(direction => {
+            var sideField = field.getSideField(direction, world);
+            if(sideField === null || field.getNationId() !== sideField.getNationId()) drawFieldBorder(field, direction);
+        });
+    }
+
+    function getMovedLocation(x, y, direction){
+        if(x instanceof Field){
+            direction = y;
+            y = x.getY();
+            x = x.getX();
+        }
+
+        var xx = 0.5;
+        var yy = 0.5;
+
+        if(direction & Direction.CENTER_HORIZONTAL) xx = 0.5;
+        if(direction & Direction.CENTER_VERTICAL) yy = 0.5;
+
+        if(direction & Direction.UP) yy = 0;
+        else if(direction & Direction.DOWN) yy = 1;
+
+        if(direction & Direction.LEFT) xx = 0;
+        else if(direction & Direction.RIGHT) xx = 1;
+
+        return {
+            x: (x + xx) * options.fieldSize,
+            y: (y + yy) * options.fieldSize
+        };
+    }
+
+    function drawFieldBorder(field, direction){
+        var a = getMovedLocation(field, borders[direction][0]);
+        var b = getMovedLocation(field, borders[direction][1]);
+
+        sketch.lineWidth = ceil(options.fieldSize / 20);
+        sketch.strokeStyle = Colors[field.getNationId()].dark;
+
+        var size = sketch.lineWidth / 2;
+
+        sketch.beginPath();
+        sketch.moveTo(a.x + borders[direction][2] * size, a.y + borders[direction][3] * size);
+        sketch.lineTo(b.x + borders[direction][2] * size, b.y + borders[direction][3] * size);
+        sketch.stroke();
     }
 
     sketch.draw = function(){
