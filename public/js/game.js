@@ -87,25 +87,15 @@ $(function(){
         sketch.fillText(field.getMeta().toString(10), x + options.fieldSize / 2, y + options.fieldSize / 2);
     }
 
-    var borders = {};
-    borders[Direction.NORTH] = [Direction.NORTHWEST, Direction.NORTHEAST,  0,  1];
-    borders[Direction.EAST]  = [Direction.NORTHEAST, Direction.SOUTHEAST, -1,  0];
-    borders[Direction.SOUTH] = [Direction.SOUTHEAST, Direction.SOUTHWEST,  0, -1];
-    borders[Direction.WEST]  = [Direction.SOUTHWEST, Direction.NORTHWEST,  1,  0];
-
-    function drawFieldBorders(field){
-        Direction.FOUR.forEach(direction => {
-            var sideField = field.getSideField(direction, world);
-            if(sideField === null || field.getNationId() !== sideField.getNationId()) drawFieldBorder(field, direction);
-        });
-    }
-
-    function getMovedLocation(x, y, direction){
+    function getMovedLocation(x, y, direction, xxx, yyy){
         if(x instanceof Field){
             direction = y;
             y = x.getY();
             x = x.getX();
         }
+
+        xxx = xxx || 0;
+        yyy = yyy || 0;
 
         var xx = 0.5;
         var yy = 0.5;
@@ -114,30 +104,86 @@ $(function(){
         if(direction & Direction.CENTER_VERTICAL) yy = 0.5;
 
         if(direction & Direction.UP) yy = 0;
-        else if(direction & Direction.DOWN) yy = 1;
+        else if(direction & Direction.DOWN){
+            yy = 1; yyy = -yyy;
+        }
 
         if(direction & Direction.LEFT) xx = 0;
-        else if(direction & Direction.RIGHT) xx = 1;
+        else if(direction & Direction.RIGHT){
+            xx = 1; xxx = -xxx;
+        }
 
         return {
-            x: (x + xx) * options.fieldSize,
-            y: (y + yy) * options.fieldSize
+            x: (x + xx) * options.fieldSize + xxx,
+            y: (y + yy) * options.fieldSize + yyy
         };
+    }
+
+    var borders = {};
+    borders[Direction.NORTH] = [Direction.NORTHWEST, Direction.NORTHEAST,  0,  1];
+    borders[Direction.EAST]  = [Direction.NORTHEAST, Direction.SOUTHEAST, -1,  0];
+    borders[Direction.SOUTH] = [Direction.SOUTHEAST, Direction.SOUTHWEST,  0, -1];
+    borders[Direction.WEST]  = [Direction.SOUTHWEST, Direction.NORTHWEST,  1,  0];
+
+    var corners = [
+        [Direction.NORTH, Direction.EAST],
+        [Direction.EAST, Direction.SOUTH],
+        [Direction.SOUTH, Direction.WEST],
+        [Direction.WEST, Direction.NORTH]
+    ];
+
+    var lineWidthPercent = 15;
+
+    function drawFieldBorders(field){
+        var count = 0;
+        Direction.FOUR.forEach(direction => {
+            var sideField = field.getSideField(direction, world);
+            if(sideField === null || field.getNationId() !== sideField.getNationId()) drawFieldBorder(field, direction);
+            else count++;
+        });
+
+        if(count > 1){
+            corners.forEach(corner => {
+                var sideFields = [field.getSideField(corner[0], world), field.getSideField(corner[1], world)];
+                if(sideFields.some(sideField => sideField === null)) return;
+                if(sideFields.every(sideField => sideField.getNationId() === field.getNationId())){
+                    drawFieldCorner(field, corner[0] | corner[1]);
+                }
+            });
+        }
     }
 
     function drawFieldBorder(field, direction){
         var a = getMovedLocation(field, borders[direction][0]);
         var b = getMovedLocation(field, borders[direction][1]);
 
-        sketch.lineWidth = ceil(options.fieldSize / 16);
+        sketch.lineWidth = ceil(options.fieldSize / lineWidthPercent);
         sketch.strokeStyle = Colors[field.getNationId()].dark;
-
         var size = sketch.lineWidth / 2;
 
         sketch.beginPath();
         sketch.moveTo(a.x + borders[direction][2] * size, a.y + borders[direction][3] * size);
         sketch.lineTo(b.x + borders[direction][2] * size, b.y + borders[direction][3] * size);
         sketch.stroke();
+    }
+
+    function drawFieldCorner(field, direction){
+        if(field === null) return;
+
+        sketch.lineWidth = ceil(options.fieldSize / lineWidthPercent);
+        sketch.fillStyle = Colors[field.getNationId()].dark;
+        var size = sketch.lineWidth;
+
+        var a = getMovedLocation(field, direction, null, 0, size);
+        var b = getMovedLocation(field, direction);
+        var c = getMovedLocation(field, direction, null, size, 0);
+
+        sketch.beginPath();
+        sketch.moveTo(a.x, a.y);
+        sketch.lineTo(b.x, b.y);
+        sketch.lineTo(c.x, c.y);
+        sketch.lineTo(a.x, a.y);
+        sketch.fill();
     }
 
     sketch.draw = function(){
