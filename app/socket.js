@@ -23,7 +23,7 @@ var FieldType = common.FieldType;
 var Colors    = common.Colors;
 
 module.exports = function(io){
-    var fieldCount = 10;
+    var fieldCount = 10 + Math.floor(Math.random() * 11);
     var world = new World(fieldCount, fieldCount);
 
     io.on('connection', function(socket){
@@ -34,7 +34,7 @@ module.exports = function(io){
     function createRandomField(){
         var x = Math.floor(Math.random() * fieldCount);
         var y = Math.floor(Math.random() * fieldCount);
-        var type = (Math.floor(Math.random() * Colors.length / 2) << 4) | FieldType.TERRITORY;
+        var type = (Math.floor(Math.random() * Colors.length) << 4) | FieldType.TERRITORY;
         var meta = Math.floor(Math.random() * 1000);
 
         return new Field(x, y, type, meta);
@@ -46,5 +46,5 @@ module.exports = function(io){
         return fields;
     }
 
-    setInterval(() => io.emit('update field', createRandomFields().map(f => world.setField(f)).map(f => f.toString()).join(';')), 300);
+    setInterval(() => io.emit('update field', createRandomFields().map(f => world.setField(f)).map(f => f.toString()).join(';')), 500);
 };

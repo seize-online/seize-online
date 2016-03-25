@@ -129,7 +129,7 @@ $(function(){
         var a = getMovedLocation(field, borders[direction][0]);
         var b = getMovedLocation(field, borders[direction][1]);
 
-        sketch.lineWidth = ceil(options.fieldSize / 20);
+        sketch.lineWidth = ceil(options.fieldSize / 16);
         sketch.strokeStyle = Colors[field.getNationId()].dark;
 
         var size = sketch.lineWidth / 2;
