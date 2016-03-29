@@ -70,19 +70,19 @@ $(function(){
     });
 
     function drawField(field){
-        var x = field.getX() * options.fieldSize;
-        var y = field.getY() * options.fieldSize;
+        var x = field.getX() * options.fieldPixels;
+        var y = field.getY() * options.fieldPixels;
 
         sketch.fillStyle = Colors[field.getNationId()].color;
-        sketch.fillRect(x, y, options.fieldSize, options.fieldSize);
+        sketch.fillRect(x, y, options.fieldPixels, options.fieldPixels);
 
         drawFieldBorders(field);
 
         sketch.textAlign = 'center';
         sketch.textBaseline = 'middle';
-        sketch.font = ceil(options.fieldSize / 4) + "px 'Ubuntu Mono'";
+        sketch.font = ceil(options.fieldPixels / 4) + "px 'Ubuntu Mono'";
         sketch.fillStyle = Colors[field.getNationId()].text;
-        sketch.fillText(field.getMeta().toString(10), x + options.fieldSize / 2, y + options.fieldSize / 2);
+        sketch.fillText(field.getMeta().toString(10), x + options.fieldPixels / 2, y + options.fieldPixels / 2);
     }
 
     function getMovedLocation(x, y, direction, xxx, yyy){
@@ -112,8 +112,8 @@ $(function(){
         }
 
         return {
-            x: (x + xx) * options.fieldSize + xxx,
-            y: (y + yy) * options.fieldSize + yyy
+            x: (x + xx) * options.fieldPixels + xxx,
+            y: (y + yy) * options.fieldPixels + yyy
         };
     }
 
@@ -155,7 +155,7 @@ $(function(){
         var a = getMovedLocation(field, borders[direction][0]);
         var b = getMovedLocation(field, borders[direction][1]);
 
-        sketch.lineWidth = ceil(options.fieldSize / lineWidthPercent);
+        sketch.lineWidth = ceil(options.fieldPixels / lineWidthPercent);
         sketch.strokeStyle = Colors[field.getNationId()].dark;
         var size = sketch.lineWidth / 2;
 
@@ -168,7 +168,7 @@ $(function(){
     function drawFieldCorner(field, direction){
         if(field === null) return;
 
-        sketch.lineWidth = ceil(options.fieldSize / lineWidthPercent);
+        sketch.lineWidth = ceil(options.fieldPixels / lineWidthPercent);
         sketch.fillStyle = Colors[field.getNationId()].dark;
         var size = sketch.lineWidth;
 
