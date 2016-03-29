@@ -29,7 +29,7 @@ $(function(){
 
     var options = {
         fieldPixels: 0,
-        worldPixels: min($(window).innerWidth(), $(window).innerHeight()),
+        worldPixels: min($(window).innerWidth(), $(window).innerHeight()) - 50,
         isRetina: (window.devicePixelRatio || 0) >= 2
     };
 
