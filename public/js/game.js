@@ -24,20 +24,20 @@ var socket = null;
 var world = null;
 
 $(function(){
+    socket = io();
+    world = new World();
+
     var options = {
-        fieldCount: 0, fieldSize: 0,
-        size: min($(window).innerWidth(), $(window).innerHeight()),
-        retina: (window.devicePixelRatio || 0) >= 2
+        fieldPixels: 0,
+        worldPixels: min($(window).innerWidth(), $(window).innerHeight()),
+        isRetina: (window.devicePixelRatio || 0) >= 2
     };
 
     sketch = Sketch.create({
         container: document.getElementById('sketch'),
-        fullscreen: false, width: options.size, height: options.size,
-        autostart: false, autopause: false, autoclear: true, retina: options.retina
+        fullscreen: false, width: options.worldPixels, height: options.worldPixels,
+        autostart: false, autopause: false, autoclear: true, retina: options.isRetina
     });
-
-    socket = io();
-    world = new World();
 
     socket.on('update world', function(data){
         console.log('update world', data);
@@ -50,10 +50,8 @@ $(function(){
         console.log('update meta', data);
 
         if(data.fieldCount){
-            options.fieldCount = data.fieldCount;
-            options.fieldSize = floor(options.size / options.fieldCount);
-            world.width = world.height = options.fieldCount;
-
+            world.width = world.height = options.fieldCount = data.fieldCount;
+            options.fieldPixels = floor(options.worldPixels / options.fieldCount);
             sketch.start();
         }
     });
@@ -189,4 +187,16 @@ $(function(){
     sketch.draw = function(){
         world.forEach(drawField);
     };
+
+    function resize(){
+        var margins = [
+            ($(window).width() - $('#sketch canvas').width()) / 2,
+            ($(window).height() - $('#sketch canvas').height()) / 2
+        ].map(m => m + 'px');
+
+        $('#sketch canvas').css('margin', [margins[1], margins[0], margins[1], margins[0]].join(' '));
+    }
+
+    resize();
+    $(window).resize(resize);
 });

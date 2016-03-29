@@ -46,5 +46,5 @@ module.exports = function(io){
         return fields;
     }
 
-    setInterval(() => io.emit('update field', createRandomFields().map(f => world.setField(f)).map(f => f.toString()).join(';')), 500);
+    setInterval(() => io.emit('update field', createRandomFields().map(f => world.setField(f)).map(f => f.toString()).join(';')), 200);
 };
