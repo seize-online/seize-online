@@ -60,6 +60,7 @@ var Colors = [
 
 Object.freeze(Colors);
 
+//0bNNNBATE
 var FieldType = {
     ENERGE:    1,
     TERRITORY: 1 << 1,
@@ -89,7 +90,16 @@ Field.prototype = {
         return this.type; //0bNNNBATE
     },
 
+    setType: function(type){
+        this.type = type;
+    },
+
     getMeta: function(){
+        return this.meta;
+    },
+
+    setMeta: function(meta){
+        this.meta = meta;
         return this.meta;
     },
 
@@ -109,8 +119,17 @@ Field.prototype = {
         return this.getType() & FieldType.BARRIER;
     },
 
+    hasPower: function(){
+        return this.isEnerge() || this.isTerritory();
+    },
+
     getNationId: function(){
         return (this.getType() >> 4) & 7;
+    },
+
+    setNationId: function(nationId){
+        this.setType((this.getType() - (this.getNationId() << 4)) | (nationId << 4));
+        return nationId;
     },
 
     getSideField: function(direction, world){

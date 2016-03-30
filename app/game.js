@@ -18,6 +18,11 @@
 var common = require('../public/js/common');
 var Direction = common.Direction;
 
+var ratio = 5;
+function synchronizePower(a, b){
+    if(a.hasPower() && b.hasPower()) b.setMeta(sum - a.setMeta(Math.floor(sum / 2)));
+};
+
 function Game(world, io){
     this.world = world;
     this.io = io;
@@ -31,14 +36,14 @@ Game.prototype.tick = function(buffer){
     var self = this;
     this.getWorld().forEach(function(field){
         if(!field.isTerritory()) return;
-
         if(field.isEnerge()){
             field.meta += Math.floor((field.isAdvanced() ? 20 : 5) + Math.random() * 10);
+            field.hasUpdated = true;
         }
 
         var d = Math.floor(Math.random() * Direction.FOUR.length);
         var sideField = field.getSideField(Direction.FOUR[d], self.getWorld());
 
-        //TODO: Implement this method
+        if(field.getNationId() === sideField.getNationId())
     });
 };
