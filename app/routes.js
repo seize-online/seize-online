@@ -18,18 +18,35 @@
 var path = require('path');
 var express = require('express');
 
+function isAuthenticated(req, res, next){
+   if(req.isAuthenticated()) return next();
+   res.redirect('/');
+}
+
 module.exports = (app, passport) => {
     app.use('/',            express.static(path.join(__dirname, '..', 'public')));
+    app.use('/mdi',         express.static(path.join(__dirname, '..', 'node_modules', 'mdi')));
     app.use('/jquery',      express.static(path.join(__dirname, '..', 'node_modules', 'jquery', 'dist')));
     app.use('/sketch',      express.static(path.join(__dirname, '..', 'node_modules', 'sketch-js', 'js')));
     app.use('/materialize', express.static(path.join(__dirname, '..', 'node_modules', 'materialize-css', 'dist')));
 
     app.get('/', function(req, res, next){
-      res.render('index');
+      res.render('index', { req });
     });
 
-    app.get('/game', function(req, res, next){
-      res.render('game');
+    app.get('/game', isAuthenticated, function(req, res, next){
+        res.render('game');
+    });
+
+    app.get('/auth/twitter', passport.authenticate('twitter'));
+    app.get('/auth/twitter/callback', passport.authenticate('twitter', { successRedirect: '/', failureRedirect: '/' }));
+    app.get('/logout', isAuthenticated, function(req, res){
+        req.logout();
+        res.redirect('/');
+    });
+
+    app.get('/rooms', function(req, res){
+        res.json(socket.rooms);
     });
 
     app.use(function(req, res, next){

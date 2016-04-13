@@ -24,7 +24,7 @@ var socket = null;
 var world = null;
 
 $(function(){
-    socket = io();
+    socket = io('/game');
     world = new World();
 
     var options = {

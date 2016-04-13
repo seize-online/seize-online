@@ -15,14 +15,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-var TwitterStrategy  = require('passport-twitter').Strategy;
+var User = require('../models/user');
+var TwitterStrategy = require('passport-twitter').Strategy;
 var passportConfig = require('../config/passport');
 
-module.exports = function(passport){
+module.exports = function(app, passport){
     passport.serializeUser((user, done) => done(null, user.id));
     passport.deserializeUser((id, done) => User.findOne({ id: id }, done));
 
-    passport.use(new TwitterStrategy(passportConfig, (token, tokenSecret, profile, done) => process.nextTick(() => User.findOne({ 'id': profile.id }, (err, user) => {
+    passport.use(new TwitterStrategy(passportConfig(app.get('port')), (token, tokenSecret, profile, done) => process.nextTick(() => User.findOne({ 'id': profile.id }, (err, user) => {
         if(err) return done(err);
         if(user) return done(null, user);
 

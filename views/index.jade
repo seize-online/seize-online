@@ -1,5 +1,26 @@
 extends layout
 
+mixin button(color, text, href, icon)
+    a.btn.btn-large.waves-light.waves-effect(class="#{color}" href="#{href || '#'}")
+        if icon
+            i.left.mdi(class="mdi-#{icon}")
+        | #{text}
+        
+append stylesheets
+    link(charset='utf-8', rel='stylesheet', href='/css/index.css')
+
+append scripts
+    script(charset='utf-8', src='/js/index.js')
+    if req.isAuthenticated()
+        script(charset='utf-8', src='/socket.io/socket.io.js')
+
 block content
-    .container
-        p.chip Hello, world!
+    main.container.section
+        h1.white-text.center
+            i.mdi.mdi-flask
+            | &nbsp;seize.online
+        .center
+            if req.isAuthenticated()
+                include include/index
+            else
+                +button('light-blue', 'Sign in with Twitter', '/auth/twitter', 'twitter')

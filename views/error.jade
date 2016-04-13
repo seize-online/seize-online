@@ -1,6 +1,11 @@
 extends layout
 
 block content
-  h1= message
-  h2= error.status
-  pre #{error.stack}
+    nav.red
+        .nav-wrapper.container
+            .brand-logo= (error.status ? error.status + ' ' : ' ') + message
+    
+    .section.container
+        .card
+            pre(style="padding: 16px;") #{error.stack}
+        a.btn.btn-large.waves-light.waves-effect.right.pink(href="/") Back to title

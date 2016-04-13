@@ -67,19 +67,22 @@ process.on('SIGINT', exit).on('SIGTERM', exit);
 var mongoStore = new MongoStore({ mongooseConnection: db });
 app.use(session({ secret: 'seize', key: 'seize.sid', store: mongoStore, resave: true, saveUninitialized: true }));
 
-// app.use(passport.initialize());
-// app.use(passport.session());
+app.use(passport.initialize());
+app.use(passport.session());
 
 var server = http.createServer(app);
 var io = require('socket.io')(server);
 
-// io.use(passportSocketIo.authorize({ cookieParser: cookieParser, secret: 'seize', key: 'seize.sid', store: mongoStore }));
+io.use(passportSocketIo.authorize({ cookieParser: cookieParser, secret: 'seize', key: 'seize.sid', store: mongoStore }));
 
-require('./app/socket')(io);
-require('./app/routes')(app);
+require('./app/passport')(app, passport);
+require('./app/routes')(app, passport);
+require('./app/socket')(app, io);
 
 server.listen(app.get('port'), () => {
     console.log('Listening on port ' + app.get('port'));
+    require('./models/user').find((err, data) => console.log(data));
+
     //setInterval(() => io.emit('hello', '#' + ('000000' + Math.floor(Math.random() * 0x1000000).toString(16)).slice(-6)), 1000);
 });
 
@@ -89,11 +92,11 @@ server.on('error', error => {
 
     switch(error.code){
         case 'EACCES':
-            console.error(bind, 'requires elevated privileges');
+            console.error(bind, "requires elevated privileges");
             process.exit(1); break;
 
         case 'EADDRINUSE':
-            console.error(bind,'is already in use');
+            console.error(bind, "is already in use");
             process.exit(1); break;
 
         default: throw error;

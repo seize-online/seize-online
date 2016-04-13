@@ -22,11 +22,35 @@ var Field     = common.Field;
 var FieldType = common.FieldType;
 var Colors    = common.Colors;
 
-module.exports = function(io){
+var Room = require('./room');
+var rooms = [];
+
+module.exports = function(app, io){
+    var room = io.of('room');
+
+    room.on('connection', function(socket){
+        function emitRoomList(target){
+            target = target || room;
+            console.log(rooms);
+
+            var firstRooms = rooms.slice(0, Math.min(30, rooms.length)).map(r => r.name);
+            target.emit('room list', firstRooms);
+        }
+        emitRoomList(socket);
+
+        socket.on('room create', function(name){
+            console.log(name);
+            
+            rooms.push(new Room(name));
+            emitRoomList();
+        });
+    });
+
     var fieldCount = 10 + Math.floor(Math.random() * 11);
     var world = new World(fieldCount, fieldCount);
 
-    io.on('connection', function(socket){
+    var game = io.of('game');
+    game.on('connection', function(socket){
         socket.emit('update meta', { 'fieldCount': fieldCount });
         socket.emit('update world', world.toString());
     });
@@ -46,5 +70,5 @@ module.exports = function(io){
         return fields;
     }
 
-    setInterval(() => io.emit('update field', createRandomFields().map(f => world.setField(f)).map(f => f.toString()).join(';')), 200);
+    setInterval(() => game.emit('update field', createRandomFields().map(f => world.setField(f)).map(f => f.toString()).join(';')), 200);
 };

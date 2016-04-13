@@ -15,21 +15,22 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-@import url(https://fonts.googleapis.com/css?family=Ubuntu:300,300italic,400,400italic,500,500italic,700,700italic);
-@import url(https://fonts.googleapis.com/css?family=Ubuntu+Mono:400,400italic,700,700italic);
+"use strict";
 
-html, body {
-    background-color: #222222;
-    overflow: hidden; z-index: -2; margin: 0;
-    font-family: Ubuntu, sans-serif;
-}
+var socket;
+$(function(){
+    socket = io('/room');
+    socket.on('room list', function(array){
+        console.log("room list"); console.log(array);
 
-pre {
-    font-size: 16px;
-    font-family: 'Ubuntu Mono', monospace;
-}
+        $('#rooms').empty();
+        array.forEach(name => $('<div>').addClass('chip room').text(name).appendTo('#rooms'));
+    });
 
-#sketch {
-    z-index: -1; position: absolute;
-    top: 0px; left: 0px; right: 0px;
-}
+    $("#createRoomButton").click(function(){
+        var name = Array.apply(null, Array(Math.floor(4 + Math.random() * 16))).map(i => String.fromCharCode(97 + Math.random() * 26)).join('');
+        console.log(name);
+
+        socket.emit('room create', name);
+    });
+});

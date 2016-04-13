@@ -15,21 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-@import url(https://fonts.googleapis.com/css?family=Ubuntu:300,300italic,400,400italic,500,500italic,700,700italic);
-@import url(https://fonts.googleapis.com/css?family=Ubuntu+Mono:400,400italic,700,700italic);
+var User = require('../models/user');
 
-html, body {
-    background-color: #222222;
-    overflow: hidden; z-index: -2; margin: 0;
-    font-family: Ubuntu, sans-serif;
+function Room(name){
+    this.name = name;
+    this.members = [];
 }
 
-pre {
-    font-size: 16px;
-    font-family: 'Ubuntu Mono', monospace;
-}
-
-#sketch {
-    z-index: -1; position: absolute;
-    top: 0px; left: 0px; right: 0px;
-}
+module.exports = Room;

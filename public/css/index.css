@@ -1,0 +1,21 @@
+.buttons a.btn {
+    margin: 5px;
+}
+
+.corner {
+    position: absolute;
+    bottom: 16px;
+    right: 16px;
+}
+
+#roomArea {
+    margin: 32px;
+}
+
+#createRoomButton {
+    margin-bottom: 8px;
+}
+
+.room.chip {
+    margin: 4px;
+}
